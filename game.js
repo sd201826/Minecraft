@@ -87,7 +87,7 @@ function updateMining(dt){
  if(k!==mineKey){mineKey=k;mineProgress=0;}mineProgress+=dt*toolSpeed(type)/hardness(type);
  breakMeter.parentElement.classList.add('active');breakMeter.style.width=Math.min(100,mineProgress*100)+'%';if(mineProgress>=1){breakBlock(x,y,z,type);mineProgress=0;mineKey='';}
 }
-function placeBlock(){const item=barItems[selected];if(item==='pickaxe'||item==='spear'||!(inventory[item]>0))return;const h=target(5.5);if(!h)return;const [x,y,z]=hitBlock(h,false);if(get(x,y,z)!=='air')return;if(Math.abs(player.x-x)<.8&&Math.abs(player.z-z)<.8&&player.y-.9<y+.5&&player.y+.9>y-.5)return;inventory[item]--;setBlock(x,y,z,item);drawBar();}
+function placeBlock(){const item=barItems[selected];if(item==='pickaxe'||item==='shovel'||!(inventory[item]>0))return;const h=target(5.5);if(!h)return;const [x,y,z]=hitBlock(h,false);if(get(x,y,z)!=='air')return;if(Math.abs(player.x-x)<.8&&Math.abs(player.z-z)<.8&&player.y-.9<y+.5&&player.y+.9>y-.5)return;inventory[item]--;setBlock(x,y,z,item);drawBar();}
 function move(dt){
  const f=(pressed.KeyW||pressed.ArrowUp?1:0)-(pressed.KeyS||pressed.ArrowDown?1:0),s=(pressed.KeyD||pressed.ArrowRight?1:0)-(pressed.KeyA||pressed.ArrowLeft?1:0),mag=Math.hypot(f,s)||1,speed=pressed.ShiftLeft||pressed.ShiftRight?8.5:5.1;
  const dx=(-Math.sin(yaw)*f+Math.cos(yaw)*s)/mag*speed*dt,dz=(-Math.cos(yaw)*f-Math.sin(yaw)*s)/mag*speed*dt,ox=player.x,oz=player.z;player.x+=dx;if(collision(player.x,player.y,player.z))player.x=ox;player.z+=dz;if(collision(player.x,player.y,player.z))player.z=oz;
