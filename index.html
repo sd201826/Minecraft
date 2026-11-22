@@ -13,7 +13,8 @@
   <div id="hud">
     <div class="brand">BLOCKWORLD <span>EARLY ACCESS</span></div>
     <div class="stats"><span id="fps">-- FPS</span><span id="coords">0, 0, 0</span></div>
-    <div class="crosshair"><i></i><b></b></div>\n    <div class="break-meter"><div id="breakFill"></div></div>
+    <div class="crosshair"><i></i><b></b></div>
+    <div class="break-meter"><div id="breakFill"></div></div>
     <div id="hotbar" aria-label="Hotbar"></div>
     <div class="help">WASD move · Mouse look · Space jump · Shift sprint<br>Hold left click mine · Right click build · 1–9 select · E inventory · F spear attack</div>
     <div class="actions"><button id="saveBtn" title="Save world">SAVE</button><button id="fullscreenBtn" title="Fullscreen">⛶</button></div>
@@ -41,9 +42,13 @@
   <section id="inventoryScreen" class="screen hidden">
     <div class="menu inventory-menu">
       <div class="eyebrow">YOUR ITEMS</div><h2>Inventory</h2>
+      <div class="section-label">BACKPACK</div>
       <div id="inventoryGrid"></div>
+      <div class="section-label">CRAFTING</div>
+      <div id="craftRecipes"></div>
+      <p id="craftStatus" class="craft-status">Gather logs and stone to craft equipment.</p>
       <div class="pack-row"><label for="packFile">Load a color resource pack (.json)</label><input id="packFile" type="file" accept=".json,application/json"></div>
-      <p id="packStatus" class="menu-foot">Packs use a simple JSON color format; Java/Bedrock packs are not supported yet.</p>
+      <p id="packStatus" class="menu-foot">Import a BlockWorld JSON colour pack. Standard Java/Bedrock packs are not supported yet.</p>
       <button class="primary" id="closeInventory">BACK TO GAME</button>
     </div>
   </section>
