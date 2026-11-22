@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root{color-scheme:dark;font-family:Inter,system-ui,Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#17231e;color:#fff}
+body{user-select:none}
+#game{position:fixed;inset:0}
+#game canvas{display:block;width:100%;height:100%;outline:none}
+#hud{position:fixed;inset:0;pointer-events:none;text-shadow:0 2px 5px #000b}
+.brand{position:absolute;top:20px;left:24px;font-size:17px;font-weight:900;letter-spacing:2px}
+.brand span{font-size:9px;letter-spacing:1px;color:#d7edb5;border:1px solid #d7edb566;border-radius:20px;padding:4px 7px;margin-left:5px;vertical-align:middle}
+.stats{position:absolute;right:24px;top:20px;display:flex;gap:18px;font-size:11px;color:#eef5eb;letter-spacing:.6px}
+.crosshair{position:absolute;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);filter:drop-shadow(0 1px 2px #000)}
+.crosshair i,.crosshair b{position:absolute;background:#fff;border-radius:2px;left:8px;top:1px;width:2px;height:16px}
+.crosshair b{transform:rotate(90deg)}
+#hotbar{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:5px;padding:6px;background:#111a;border:1px solid #ffffff44;border-radius:9px;backdrop-filter:blur(8px)}
+.slot{width:51px;height:51px;position:relative;border:1px solid #ffffff55;background:#26352dbb;border-radius:5px;display:grid;place-items:center;font-size:25px;cursor:pointer;pointer-events:auto}
+.slot.selected{outline:2px solid #fff;outline-offset:1px;background:#718b5cdd;transform:translateY(-5px)}
+.slot .num{position:absolute;top:2px;left:5px;font-size:9px;color:#e7eee3}
+.slot .amount{position:absolute;bottom:1px;right:4px;font-size:10px;font-weight:700}
+.help{position:absolute;bottom:25px;left:24px;font-size:11px;line-height:1.8;color:#f4f6ed;background:#101a17aa;padding:9px 12px;border:1px solid #ffffff28;border-radius:7px;backdrop-filter:blur(5px)}
+.actions{position:absolute;right:24px;bottom:26px;display:flex;gap:7px;pointer-events:auto}
+.actions button{border:1px solid #ffffff55;background:#14231dbb;color:white;border-radius:6px;padding:8px 11px;font-size:11px;cursor:pointer}
+.screen{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:linear-gradient(130deg,#09130dcc,#14251ac9);backdrop-filter:blur(8px)}
+.hidden{display:none!important}
+.menu{width:min(490px,92vw);padding:36px 38px 27px;border:1px solid #b9d69a66;border-radius:13px;background:linear-gradient(145deg,#263b2df2,#17251ef5);box-shadow:0 24px 90px #0009;text-align:center}
+.menu.compact{width:min(420px,92vw)}
+.eyebrow{color:#bdd69e;font-weight:800;font-size:10px;letter-spacing:2px}
+h1{font-size:clamp(42px,9vw,66px);line-height:1;margin:17px 0;letter-spacing:-3px;font-weight:900}
+h1 span{color:#a9d47d}
+h2{font-size:28px;margin:16px 0}
+.menu p{color:#cfddce;font-size:13px;line-height:1.7;max-width:360px;margin:0 auto 24px}
+button{font-family:inherit;font-weight:800;letter-spacing:.5px}
+.primary,.secondary{border:0;border-radius:6px;padding:14px 20px;cursor:pointer}
+.primary{background:#a6d477;color:#172519;min-width:185px}
+.primary:hover{background:#c0eb91;transform:translateY(-1px)}
+.secondary{background:#ffffff18;color:#e9f3e4;border:1px solid #ffffff3b;margin-left:6px}
+.menu-foot{font-size:10px;color:#93a894;margin-top:20px}
+#inventoryGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:20px 0}
+.inventory-item{padding:13px 5px 10px;border:1px solid #ffffff35;border-radius:7px;background:#ffffff0d;color:white;cursor:pointer;display:grid;gap:5px;justify-items:center}
+.inventory-item:hover{background:#a6d4772e;border-color:#a6d477}
+.inventory-item strong{font-size:22px}.inventory-item span{font-size:10px;color:#d8e4d3}.inventory-item small{font-size:9px;color:#b5d29d}
+.pack-row{padding:13px;text-align:left;border:1px solid #ffffff2c;border-radius:7px;background:#ffffff0a}
+.pack-row label{display:block;font-size:11px;margin-bottom:9px;color:#deebd9}
+.pack-row input{font-size:11px;max-width:100%}
+#packStatus{font-size:10px;margin:10px auto}
+@media(max-width:650px){.brand{left:12px;top:12px;font-size:13px}.stats{right:12px;top:47px;gap:8px}.help{left:10px;bottom:96px;font-size:9px}.actions{right:10px;bottom:96px}.slot{width:39px;height:42px;font-size:20px}#hotbar{bottom:12px;gap:3px}.menu{padding:28px 20px}.inventory-item{padding:9px 3px}}
