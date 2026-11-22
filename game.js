@@ -20,7 +20,7 @@ const blockInfo = {
   water: {name:'Water', icon:'🟦', solid:false, drop:null},
   bedrock: {name:'Bedrock', icon:'⬛', solid:true, drop:null}
 };
-const hotbarItems = ['grass','dirt','stone','wood','planks','leaves','sand','spear'];
+const hotbarItems = ['grass','dirt','stone','wood','planks','leaves','sand','reachTool'];
 const packColors = {};
 
 let scene, camera, renderer, sun, hemi;
@@ -352,8 +352,8 @@ function drawHotbar() {
   hotbarItems.forEach((item,i)=>{
     const node=document.createElement('div');
     node.className='slot'+(selected===i?' selected':'');
-    const icon=item==='spear'?'🔱':blockInfo[item].icon;
-    const amount=item==='spear'?'∞':(inventory[item]??0);
+    const icon=item==='reachTool'?'⛏️':blockInfo[item].icon;
+    const amount=item==='reachTool'?'∞':(inventory[item]??0);
     node.innerHTML='<span class="num">'+(i+1)+'</span><strong>'+icon+'</strong><span class="amount">'+amount+'</span>';
     node.addEventListener('click',()=>{selected=i;drawHotbar()});
     root.appendChild(node);
@@ -361,16 +361,16 @@ function drawHotbar() {
 }
 function renderInventory() {
   const root=$('inventoryGrid'); root.innerHTML='';
-  const items=['grass','dirt','stone','wood','planks','leaves','sand','coalOre','ironOre','spear'];
+  const items=['grass','dirt','stone','wood','planks','leaves','sand','coalOre','ironOre','reachTool'];
   items.forEach(item=>{
     const info=blockInfo[item];
-    const name=item==='spear'?'Spear (reach tool)':info.name;
+    const name=item==='reachTool'?'Builder tool (long reach)':info.name;
     const count=item==='spear'?'Tool':(inventory[item]??0)+' in bag';
     const button=document.createElement('button');
     button.className='inventory-item';
-    button.innerHTML='<strong>'+(item==='spear'?'🔱':info.icon)+'</strong><span>'+name+'</span><small>'+count+'</small>';
+    button.innerHTML='<strong>'+(item==='reachTool'?'⛏️':info.icon)+'</strong><span>'+name+'</span><small>'+count+'</small>';
     button.addEventListener('click',()=>{
-      if(item==='spear') selected=7;
+      if(item==='reachTool') selected=7;
       else {const idx=hotbarItems.indexOf(item); if(idx>=0) selected=idx; else $('packStatus').textContent=name+' is collected but not in the hotbar yet.';}
       drawHotbar();
     });
@@ -398,7 +398,7 @@ function resumeGame() {
 }
 function currentTarget() {
   raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
-  raycaster.far=hotbarItems[selected]==='spear'?9:6;
+  raycaster.far=hotbarItems[selected]==='reachTool'?9:6;
   const hits=raycaster.intersectObjects(worldObjects,false);
   return hits.length?hits[0]:null;
 }
@@ -423,7 +423,7 @@ function mineBlock() {
 }
 function placeBlock() {
   const item=hotbarItems[selected];
-  if(item==='spear') return;
+  if(item==='reachTool') return;
   if((inventory[item]||0)<=0) return;
   const hit=currentTarget(); if(!hit) return;
   const [x,y,z]=blockAtHit(hit,false);
