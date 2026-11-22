@@ -1,1 +1,1 @@
-# Mincraft
+# Minecraft
