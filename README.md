@@ -1,60 +1,47 @@
-# BlockWorld — 3D Voxel Sandbox
+# BlockWorld — classic-style 3D voxel sandbox
 
-BlockWorld is an original browser-based 3D block-building game. It is a playable prototype, not a screenshot and not the official Minecraft game.
+An original browser-playable voxel building game with a classic low-resolution pixel-art look. It is not the official Minecraft game and does not include Mojang assets.
 
-## Play it
+## Play
 
-1. Open **Settings → Pages** in this repository.
-2. Under **Build and deployment**, select **Deploy from a branch**.
-3. Choose branch **main** and folder **/(root)**, then Save.
-4. Open the Pages URL GitHub displays. The first load needs an internet connection to load the Three.js 3D engine.
+Enable **Settings → Pages → Deploy from a branch → main → /(root)**. Open the GitHub Pages URL. An internet connection is required to load the Three.js engine from jsDelivr.
 
 ## Controls
 
-| Key / input | Action |
+| Input | Action |
 |---|---|
 | WASD | Walk |
 | Mouse | Look around |
 | Space | Jump |
 | Shift | Sprint |
-| Left click | Mine the block you are looking at |
-| Right click | Place the selected block |
-| 1–8 | Select a hotbar slot |
-| E | Open inventory |
-| Esc | Pause / release mouse |
-| Spear slot | Reach farther when mining |
+| Hold left click | Mine the block under the crosshair |
+| Right click | Place selected block |
+| 1–9 | Select a hotbar slot |
+| E | Open inventory and crafting |
+| F | Attack a nearby slime with a crafted spear |
+| Esc | Release mouse / pause |
 
-## In this build
+## Features in this version
 
-- Real-time 3D first-person world made from voxel blocks
-- Procedural hills, beaches, water, trees, stone, coal and iron ore
-- Chunk-based mesh rendering that draws exposed block faces instead of creating a separate 3D object for every cube
-- Player collision, gravity, jumping, sprinting and mouse-look
-- Mining, placing, inventory and an eight-slot hotbar
-- Peaceful wandering slime creatures
-- Day/night lighting
-- Local browser saves for placed/mined blocks, player position and inventory
-- Importable BlockWorld JSON color packs
+- Classic pixel-style textures for grass, dirt, stone, logs, leaves, planks, sand and ores
+- Procedural hills, beaches, trees, water, clouds, sun and moon with a day/night lighting cycle
+- Chunk-based mesh rendering that draws exposed block faces
+- First-person movement, gravity, collision, jumping and sprinting
+- Hold-to-mine progress, block placement and nine hotbar slots
+- Inventory and crafting recipes for planks, sticks, wooden and stone pickaxes, and spears
+- Wandering slime creatures; use a spear and press **F** to attack
+- Browser-local world saves and simple JSON colour resource packs
 
-## Color resource packs
+## Simple colour packs
 
-Create a file such as `my-pack.json`:
+Import a JSON file from the inventory, for example:
 
 ```json
-{
-  "colors": {
-    "grass": "#55aa44",
-    "dirt": "#805332",
-    "stone": "#999999",
-    "wood": "#79502e",
-    "leaves": "#267a35",
-    "water": "#398ed1"
-  }
-}
+{"colors":{"grass":"#55aa44","dirt":"#805332","stone":"#999999","wood":"#79502e","leaves":"#267a35","water":"#398ed1"}}
 ```
 
-Open the inventory with **E**, then choose the JSON file under **Load a color resource pack**. This is a small BlockWorld format; it does not load standard Java or Bedrock resource packs.
+This is BlockWorld's own simple recolour format. Standard Minecraft Java/Bedrock resource packs and arbitrary code mods are not yet supported.
 
-## Current limits
+## Current limitations
 
-This is an early single-player browser game. It does not yet include multiplayer servers, a full mod loader, crafting, survival hunger/health, or compatibility with Minecraft Java/Bedrock mods. Do not install anything: the game runs in the browser once GitHub Pages is enabled.
+This remains an early single-player browser game. It does not yet have multiplayer hosting, a full mod loader, villages, caves, hunger/health or all Minecraft crafting recipes. The world saves in the browser that you play it in.
