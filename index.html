@@ -1,62 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Minecraft — BlockWorld</title>
-<style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#83bce8;font-family:system-ui,Arial;color:#fff}#game{position:fixed;inset:0}canvas{display:block}
-#hud{position:fixed;inset:0;pointer-events:none;text-shadow:1px 2px 3px #222}
-#top{position:absolute;top:14px;left:16px;font-weight:800;font-size:20px}#stats{position:absolute;top:17px;right:16px;text-align:right;font-size:12px}
-#cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:25px;font-weight:300}
-#help{position:absolute;left:16px;bottom:18px;font-size:12px;line-height:1.7;background:#0007;padding:10px 13px;border-radius:8px}
-#hotbar{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
-.slot{width:48px;height:48px;border:2px solid #aaa;background:#222b;display:grid;place-items:center;font-size:24px;position:relative;border-radius:4px}.slot.sel{border:3px solid white;background:#777b;transform:translateY(-4px)}.slot small{position:absolute;bottom:1px;right:4px;font-size:10px}
-#start,#panel{position:fixed;inset:0;display:grid;place-items:center;background:#0009;pointer-events:auto}
-.dialog{width:min(440px,92vw);background:#202b24ee;border:2px solid #a5c58b;border-radius:14px;padding:24px;text-align:center;box-shadow:0 12px 45px #0008}
-h1{margin:0 0 6px;font-size:32px}button{border:0;border-radius:7px;padding:10px 16px;margin:5px;background:#6c9d45;color:white;font-weight:700;cursor:pointer}button:hover{filter:brightness(1.12)}input{max-width:100%}.muted{color:#c6d4c0;font-size:13px;line-height:1.5}
-#panel{display:none}#panel .dialog{text-align:left}#inventory{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:16px 0}.inv{background:#ffffff18;border:1px solid #ffffff55;border-radius:7px;padding:12px 4px;text-align:center;cursor:pointer}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#18251d">
+  <title>BlockWorld — 3D Voxel Sandbox</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 </head>
-<body><div id="game"></div>
-<div id="hud"><div id="top">⛏ BLOCKWORLD <span style="font-size:11px;color:#e5f3d8">PRE-ALPHA</span></div><div id="stats">WORLD: Meadow<br>FPS: <span id="fps">--</span><br>XYZ: <span id="xyz">0, 0, 0</span></div><div id="cross">+</div><div id="help">WASD move · Space jump · Shift sprint<br>Left click break · Right click place<br>1–6 select block · E inventory · Esc pause</div><div id="hotbar"></div></div>
-<div id="start"><div class="dialog"><h1>BLOCKWORLD</h1><p class="muted">A small, original voxel sandbox. Explore, mine, build and create your own world.</p><button id="play">PLAY WORLD</button><p class="muted">Click Play, then use your mouse to look around.<br>Best on desktop with WebGL enabled.</p></div></div>
-<div id="panel"><div class="dialog"><h2>Inventory & Packs</h2><p class="muted">Choose a block for your hotbar. Import a simple resource pack JSON to recolor blocks.</p><div id="inventory"></div><label>Resource pack (.json) <input id="pack" type="file" accept=".json,application/json"></label><p id="packmsg" class="muted"></p><button id="resume">RESUME</button></div></div>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
-<script type="module">
-import * as THREE from 'three';
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x83bce8);scene.fog=new THREE.Fog(0x83bce8,22,65);
-const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,100);camera.position.set(0,5,9);
-const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;document.querySelector('#game').appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xd8edff,0x65734c,2));const sun=new THREE.DirectionalLight(0xfff1d2,2);sun.position.set(-20,35,15);scene.add(sun);
-const mats={grass:0x5c9d42,dirt:0x805332,stone:0x858b8e,wood:0x79502e,leaves:0x347d38,sand:0xcbb77b,water:0x398ed1,coal:0x333638,iron:0xc0a78b,planks:0xb8874f};
-let materials={};function makeMats(){for(const [k,c] of Object.entries(mats))materials[k]=new THREE.MeshLambertMaterial({color:c,transparent:k==='water',opacity:k==='water'?.72:1})}makeMats();
-const geo=new THREE.BoxGeometry(1,1,1),blocks=new Map(),meshes=new Map();const key=(x,y,z)=>x+','+y+','+z;
-function put(x,y,z,t){const k=key(x,y,z);if(blocks.has(k))return;blocks.set(k,t);const m=new THREE.Mesh(geo,materials[t]||materials.grass);m.position.set(x,y,z);m.userData={x,y,z};scene.add(m);meshes.set(k,m)}
-function remove(x,y,z){const k=key(x,y,z),m=meshes.get(k);if(m){scene.remove(m);matsDisposeNoop();meshes.delete(k);blocks.delete(k)}}
-function matsDisposeNoop(){}
-function height(x,z){return Math.floor(2+Math.sin(x*.22)*1.2+Math.cos(z*.19)*1.1+Math.sin((x+z)*.12)*.8)}
-for(let x=-18;x<=18;x++)for(let z=-18;z<=18;z++){const h=height(x,z);for(let y=-2;y<=h;y++)put(x,y,z,y===h?'grass':y>h-3?'dirt':'stone');if(h<2)for(let y=h+1;y<=2;y++)put(x,y,z,'water');
- if((Math.abs(x*13+z*7)%47)===0){for(let y=h+1;y<=h+3;y++)put(x,y,z,'wood');for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++)for(let dy=2;dy<=4;dy++)if(Math.abs(dx)+Math.abs(dz)+(dy===4?1:0)<5)put(x+dx,h+dy,z+dz,'leaves')}
- if((x*31+z*17)%67===0){put(x,h-2,z,'coal');put(x+1,h-3,z,'iron')}
-}
-const player={x:0,y:height(0,0)+2,z:0,vy:0};camera.position.set(player.x,player.y,player.z);let yaw=0,pitch=0,locked=false,keys={},selected='grass';const types=['grass','dirt','stone','wood','leaves','planks'];const emoji={grass:'🟩',dirt:'🟫',stone:'⬜',wood:'🪵',leaves:'🌿',planks:'🟨',sand:'🟨',coal:'⚫',iron:'🔘',water:'🟦'};
-let counts={grass:0,dirt:0,stone:0,wood:0,leaves:0,planks:0};const bar=document.querySelector('#hotbar');
-function drawBar(){bar.innerHTML='';types.forEach((t,i)=>{const d=document.createElement('div');d.className='slot'+(t===selected?' sel':'');d.innerHTML=emoji[t]+'<small>'+(i+1)+'</small>';d.onclick=()=>{selected=t;drawBar()};bar.appendChild(d)})}drawBar();
-function select(t){if(types.includes(t)){selected=t;drawBar()}}
-document.addEventListener('keydown',e=>{keys[e.code]=true;if(/^Digit[1-6]$/.test(e.code))select(types[+e.code.slice(5)-1]);if(e.code==='KeyE')togglePanel(true)});document.addEventListener('keyup',e=>keys[e.code]=false);
-renderer.domElement.addEventListener('click',()=>{if(!locked&&!document.querySelector('#panel').style.display.includes('grid'))renderer.domElement.requestPointerLock()});
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer.domElement});
-document.addEventListener('mousemove',e=>{if(!locked)return;yaw-=e.movementX*.002;pitch-=e.movementY*.002;pitch=Math.max(-1.5,Math.min(1.5,pitch));camera.rotation.order='YXZ';camera.rotation.set(pitch,yaw,0)});
-const ray=new THREE.Raycaster();function target(){ray.setFromCamera(new THREE.Vector2(0,0),camera);return ray.intersectObjects([...meshes.values()],false)[0]}
-document.addEventListener('mousedown',e=>{if(!locked)return;const hit=target();if(!hit)return;const p=hit.object.userData;if(e.button===0){const t=blocks.get(key(p.x,p.y,p.z));if(t!=='water'){counts[t]=(counts[t]||0)+1;remove(p.x,p.y,p.z)}}else if(e.button===2){const n=hit.face.normal;const x=p.x+Math.round(n.x),y=p.y+Math.round(n.y),z=p.z+Math.round(n.z);if(Math.abs(x-player.x)>0.7||Math.abs(z-player.z)>0.7||Math.abs(y-(player.y-1))>1)put(x,y,z,selected)}});
-document.addEventListener('contextmenu',e=>e.preventDefault());
-function togglePanel(show){document.exitPointerLock?.();document.querySelector('#panel').style.display=show?'grid':'none';if(show){const inv=document.querySelector('#inventory');inv.innerHTML='';Object.keys(emoji).filter(t=>t!=='water').forEach(t=>{const d=document.createElement('div');d.className='inv';d.innerHTML=emoji[t]+'<br>'+t;d.onclick=()=>{if(types.includes(t))select(t);else{types[5]=t;select(t)}togglePanel(false)};inv.appendChild(d)})}}
-document.querySelector('#play').onclick=()=>{document.querySelector('#start').style.display='none';renderer.domElement.requestPointerLock()};
-document.querySelector('#resume').onclick=()=>{togglePanel(false);renderer.domElement.requestPointerLock()};
-document.querySelector('#pack').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const p=JSON.parse(await f.text());for(const [k,v] of Object.entries(p.colors||{})){if(materials[k]&&/^#[0-9a-f]{6}$/i.test(v))materials[k].color.set(v)}document.querySelector('#packmsg').textContent='Resource pack applied!';}catch{document.querySelector('#packmsg').textContent='Invalid pack. Example: {"colors":{"grass":"#55aa44"}}'}});
-let last=performance.now(),frames=0,fpsTime=last;
-function loop(now){requestAnimationFrame(loop);const dt=Math.min((now-last)/1000,.04);last=now;if(locked){const speed=keys.ShiftLeft?9:5;const f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0);player.x+=(-Math.sin(yaw)*f+Math.cos(yaw)*s)*speed*dt;player.z+=(-Math.cos(yaw)*f-Math.sin(yaw)*s)*speed*dt;if(keys.Space&&player.y<=height(Math.round(player.x),Math.round(player.z))+1.05)player.vy=7;player.vy-=18*dt;player.y+=player.vy*dt;const floor=height(Math.round(player.x),Math.round(player.z))+1.65;if(player.y<floor){player.y=floor;player.vy=0}camera.position.set(player.x,player.y,player.z)}
-camera.rotation.order='YXZ';camera.rotation.set(pitch,yaw,0);renderer.render(scene,camera);frames++;if(now-fpsTime>1000){document.querySelector('#fps').textContent=frames;frames=0;fpsTime=now}document.querySelector('#xyz').textContent=[player.x,player.y,player.z].map(v=>Math.floor(v)).join(', ')}
-requestAnimationFrame(loop);
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-</script></body></html>
+<body>
+  <main id="game"></main>
+  <div id="hud">
+    <div class="brand">BLOCKWORLD <span>EARLY ACCESS</span></div>
+    <div class="stats"><span id="fps">-- FPS</span><span id="coords">0, 0, 0</span></div>
+    <div class="crosshair"><i></i><b></b></div>
+    <div id="hotbar" aria-label="Hotbar"></div>
+    <div class="help">WASD move · Mouse look · Space jump · Shift sprint<br>Left click mine · Right click build · 1–8 select · E inventory · Esc pause</div>
+    <div class="actions"><button id="saveBtn" title="Save world">SAVE</button><button id="fullscreenBtn" title="Fullscreen">⛶</button></div>
+  </div>
+
+  <section id="startScreen" class="screen">
+    <div class="menu">
+      <div class="eyebrow">A PROCEDURAL VOXEL SANDBOX</div>
+      <h1>BLOCK<span>WORLD</span></h1>
+      <p>Explore a living block world. Mine resources, build anything, and make the world yours.</p>
+      <button class="primary" id="playBtn">ENTER WORLD</button>
+      <div class="menu-foot">Single-player · Autosaves in this browser</div>
+    </div>
+  </section>
+
+  <section id="pauseScreen" class="screen hidden">
+    <div class="menu compact">
+      <div class="eyebrow">WORLD PAUSED</div><h2>Taking a break?</h2>
+      <button class="primary" id="resumeBtn">RESUME GAME</button>
+      <button class="secondary" id="pauseSaveBtn">SAVE WORLD</button>
+      <div class="menu-foot">Press Esc to resume or use the button.</div>
+    </div>
+  </section>
+
+  <section id="inventoryScreen" class="screen hidden">
+    <div class="menu inventory-menu">
+      <div class="eyebrow">YOUR ITEMS</div><h2>Inventory</h2>
+      <div id="inventoryGrid"></div>
+      <div class="pack-row"><label for="packFile">Load a color resource pack (.json)</label><input id="packFile" type="file" accept=".json,application/json"></div>
+      <p id="packStatus" class="menu-foot">Packs use a simple JSON color format; Java/Bedrock packs are not supported yet.</p>
+      <button class="primary" id="closeInventory">BACK TO GAME</button>
+    </div>
+  </section>
+
+  <section id="errorScreen" class="screen hidden">
+    <div class="menu compact"><div class="eyebrow">GRAPHICS ERROR</div><h2>3D graphics could not start</h2><p id="errorText">Please use a browser with WebGL enabled.</p><button class="primary" onclick="location.reload()">RELOAD</button></div>
+  </section>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
