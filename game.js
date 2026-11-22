@@ -223,16 +223,6 @@ function buildChunk(cx,cz) {
     }
   }
   const geometry=new THREE.BufferGeometry();
-  let indexStart=0;
-  for(let i=0;i<materialNames.length;i++) {
-    const list=lists[materialNames[i]];
-    if(!list.idx.length) continue;
-    const positions=geometry.getAttribute('position');
-    const currentPos=geometry.getAttribute('position');
-    // All material groups are appended after the complete per-material buffers below.
-    geometry.addGroup(indexStart,list.idx.length,i);
-    indexStart+=list.idx.length;
-  }
   const allP=[],allN=[],allUV=[],allI=[];
   let vertexOffset=0,indexOffset=0;
   geometry.clearGroups();
