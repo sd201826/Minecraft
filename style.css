@@ -44,3 +44,32 @@ button{font-family:inherit;font-weight:800;letter-spacing:.5px}
 .pack-row input{font-size:11px;max-width:100%}
 #packStatus{font-size:10px;margin:10px auto}
 @media(max-width:650px){.brand{left:12px;top:12px;font-size:13px}.stats{right:12px;top:47px;gap:8px}.help{left:10px;bottom:96px;font-size:9px}.actions{right:10px;bottom:96px}.slot{width:39px;height:42px;font-size:20px}#hotbar{bottom:12px;gap:3px}.menu{padding:28px 20px}.inventory-item{padding:9px 3px}}
+
+/* Classic pixel-game presentation */
+:root{font-family:Consolas,"Courier New",monospace}
+.brand{letter-spacing:1.5px;text-shadow:2px 2px 0 #263b22}
+.menu{border:2px solid #a5c77f;border-radius:3px;background:linear-gradient(145deg,#344b2cfa,#1c2a1ff7);box-shadow:0 10px 0 #08120c88,0 24px 70px #000a}
+.menu h1{font-family:Impact,Consolas,sans-serif;letter-spacing:1px;text-shadow:4px 4px 0 #182318}
+.primary,.secondary{border-radius:2px;box-shadow:inset 0 -4px 0 #0003}
+.primary{background:#75a94d;color:#101b0c;border:2px solid #b2d68b}
+.primary:hover{background:#8ec765}
+#hotbar{border-radius:2px;background:#25251fe8;border:2px solid #9b9b87;padding:5px;gap:4px}
+.slot{border-radius:1px;border:2px solid #77796c;background:#4b4b43;box-shadow:inset 2px 2px #ffffff22,inset -2px -2px #0005}
+.slot.selected{outline:2px solid #fff;outline-offset:1px;background:#8a8a70;transform:translateY(-4px)}
+.crosshair{width:16px;height:16px}
+.break-meter{position:absolute;left:50%;top:calc(50% + 24px);width:74px;height:6px;transform:translateX(-50%);background:#151812aa;border:1px solid #fff8;opacity:0;transition:opacity .08s}
+.break-meter.active{opacity:1}
+#breakFill{height:100%;width:0;background:#d5c78d;box-shadow:0 0 5px #fff8}
+.inventory-menu{max-height:94vh;overflow-y:auto}
+.section-label{font-size:10px;font-weight:900;letter-spacing:1.5px;color:#bddd96;text-align:left;margin:15px 0 8px}
+#inventoryGrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.inventory-item{border-radius:2px;background:#ffffff12;border:1px solid #a9c68c55}
+.inventory-item strong{font-size:20px}
+#craftRecipes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:8px 0}
+.recipe{padding:10px;text-align:left;display:grid;gap:5px;border:1px solid #ffffff3a;border-radius:2px;background:#252f24;color:#eee;cursor:pointer}
+.recipe strong{font-size:11px}.recipe span{font-size:10px;color:#e6d4a1}.recipe small{font-size:9px;color:#b7c5b1;line-height:1.4}
+.recipe.ready{border-color:#a7cc79;background:#35482b}
+.recipe:disabled{opacity:.5;cursor:not-allowed}
+.craft-status{font-size:10px!important;text-align:left;margin:4px 0 12px!important;color:#c5dda8!important}
+.pack-row{border-radius:2px}
+@media(max-width:700px){#hotbar{gap:2px;padding:3px}.slot{width:35px;height:39px;font-size:18px}#craftRecipes{grid-template-columns:1fr 1fr}#inventoryGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.help{font-size:9px;max-width:225px}}
