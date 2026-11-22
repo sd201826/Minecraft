@@ -18,18 +18,17 @@ Enable **Settings → Pages → Deploy from a branch → main → /(root)**. Ope
 | Right click | Place selected block |
 | 1–9 | Select a hotbar slot |
 | E | Open inventory and crafting |
-| F | Attack a nearby slime with a crafted spear |
 | Esc | Release mouse / pause |
 
 ## Features in this version
 
-- Classic pixel-style textures for grass, dirt, stone, logs, leaves, planks, sand and ores
+- Classic 16×16 pixel-style textures for grass, dirt, stone, logs, leaves, planks, sand and ores
 - Procedural hills, beaches, trees, water, clouds, sun and moon with a day/night lighting cycle
-- Chunk-based mesh rendering that draws exposed block faces
+- Chunk-based mesh rendering that draws exposed block faces instead of creating a separate 3D object for each cube
 - First-person movement, gravity, collision, jumping and sprinting
-- Hold-to-mine progress, block placement and nine hotbar slots
-- Inventory and crafting recipes for planks, sticks, wooden and stone pickaxes, and spears
-- Wandering slime creatures; use a spear and press **F** to attack
+- Hold-to-mine progress, block placement and a nine-slot hotbar
+- Inventory and crafting recipes for planks, sticks, wooden/stone pickaxes and wooden/stone shovels
+- Peaceful wandering slime creatures
 - Browser-local world saves and simple JSON colour resource packs
 
 ## Simple colour packs
@@ -44,4 +43,4 @@ This is BlockWorld's own simple recolour format. Standard Minecraft Java/Bedrock
 
 ## Current limitations
 
-This remains an early single-player browser game. It does not yet have multiplayer hosting, a full mod loader, villages, caves, hunger/health or all Minecraft crafting recipes. The world saves in the browser that you play it in.
+This remains an early single-player browser game. It does not yet include multiplayer hosting, a full mod loader, caves, villages, survival hunger/health or all Minecraft crafting recipes. The world saves in the browser where you play it.
