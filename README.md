@@ -18,6 +18,7 @@ Enable **Settings → Pages → Deploy from a branch → main → /(root)**, the
 | B or E | Open the block selection window |
 | F | Toggle distance fog |
 | M | Toggle sound |
+| G | Toggle fullscreen |
 | Esc | Pause / resume |
 
 ## Included
