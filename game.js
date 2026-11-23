@@ -124,6 +124,60 @@ function targetMob(distance=6){
  let root=hit.object;while(root.parent&& !root.userData.isMob)root=root.parent;
  return root.userData.isMob?{mob:root,distance:hit.distance}:null;
 }
+
+let audioContext=null,audioMaster=null,soundEnabled=true,lastFootstep=0;
+function unlockAudio(){
+ if(!soundEnabled)return;
+ try{
+  const Ctx=window.AudioContext||window.webkitAudioContext;
+  if(!Ctx)return;
+  if(!audioContext){
+   audioContext=new Ctx();audioMaster=audioContext.createGain();
+   audioMaster.gain.value=.2;audioMaster.connect(audioContext.destination);
+  }
+  if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});
+ }catch(e){console.warn('Audio is unavailable in this browser.',e);}
+}
+function tone(start,end,duration,wave='square',volume=.16){
+ if(!soundEnabled||!audioContext||audioContext.state!=='running')return;
+ const now=audioContext.currentTime,osc=audioContext.createOscillator(),gain=audioContext.createGain();
+ osc.type=wave;
+ osc.frequency.setValueAtTime(Math.max(35,start),now);
+ osc.frequency.exponentialRampToValueAtTime(Math.max(35,end),now+duration);
+ gain.gain.setValueAtTime(.0001,now);
+ gain.gain.exponentialRampToValueAtTime(volume,now+.008);
+ gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+ osc.connect(gain);gain.connect(audioMaster);osc.start(now);osc.stop(now+duration+.02);
+}
+function noise(duration=.07,volume=.12,cutoff=1800){
+ if(!soundEnabled||!audioContext||audioContext.state!=='running')return;
+ const count=Math.max(1,Math.floor(audioContext.sampleRate*duration));
+ const buffer=audioContext.createBuffer(1,count,audioContext.sampleRate),data=buffer.getChannelData(0);
+ for(let i=0;i<count;i++)data[i]=(Math.random()*2-1)*(1-i/count);
+ const source=audioContext.createBufferSource(),filter=audioContext.createBiquadFilter(),gain=audioContext.createGain();
+ source.buffer=buffer;filter.type='lowpass';filter.frequency.value=cutoff;
+ gain.gain.setValueAtTime(volume,audioContext.currentTime);
+ gain.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+duration);
+ source.connect(filter);filter.connect(gain);gain.connect(audioMaster);source.start();
+}
+function playSound(kind,block='stone'){
+ if(!soundEnabled||!audioContext||audioContext.state!=='running')return;
+ if(kind==='break'){
+  if(block==='water'){tone(720,260,.13,'sine',.11);noise(.045,.035,900);}
+  else if(block==='glass'||block==='ice'){tone(1150,420,.12,'triangle',.1);noise(.035,.025,4500);}
+  else{noise(.075,.14,block==='leaves'?3200:block==='wood'||block==='planks'?1200:1900);tone(block==='wood'||block==='planks'?180:110,70,.09,'square',.045);}
+ }else if(kind==='place'){tone(170,110,.07,'square',.09);noise(.04,.06,850);}
+ else if(kind==='jump'){tone(220,440,.13,'triangle',.075);}
+ else if(kind==='step'){noise(.045,.045,block==='grass'||block==='leaves'?950:500);}
+ else if(kind==='mob'){tone(390,250,.17,'triangle',.055);tone(250,330,.12,'sine',.035);}
+ else if(kind==='mobHit'){tone(520,190,.16,'square',.09);noise(.04,.05,1600);}
+}
+function toggleSound(){
+ soundEnabled=!soundEnabled;
+ const button=$('soundToggle');
+ if(button){button.textContent=soundEnabled?'Sound: ON':'Sound: OFF';button.classList.toggle('muted',!soundEnabled);}
+ if(soundEnabled)unlockAudio();
+}
 function init(){
  try{
   scene=new THREE.Scene();const day=new THREE.Color(0x87c5ed);scene.background=day.clone();scene.fog=new THREE.Fog(day,55,145);
