@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-const $=id=>document.getElementById(id),WORLD=128,CHUNK=16,MIN_Y=-4,MAX_Y=32,STORE='blockworld-save-v2';
+const $=id=>document.getElementById(id),WORLD=128,CHUNK=16,MIN_Y=-4,MAX_Y=32,STORE='minecraft-classic-save-v3';
 const info={grass:['Grass','🟩','grass'],dirt:['Dirt','🟫','dirt'],stone:['Stone','⬜','stone'],wood:['Oak log','🪵','wood'],leaves:['Leaves','🌿','leaves'],planks:['Oak planks','🟨','planks'],sand:['Sand','🟨','sand'],coalOre:['Coal ore','⚫','coal'],ironOre:['Iron ore','🟤','ironOre'],water:['Water','🟦',null],bedrock:['Bedrock','⬛',null],cobblestone:['Cobblestone','🪨','cobblestone'],gravel:['Gravel','▫️','gravel'],sandstone:['Sandstone','🟨','sandstone'],brick:['Bricks','🧱','brick'],stoneBrick:['Stone bricks','◻️','stoneBrick'],mossStone:['Mossy stone','🪨','mossStone'],glass:['Glass','🔹','glass'],ice:['Ice','🧊','ice'],snow:['Snow','⬜','snow'],clay:['Clay','🟫','clay'],obsidian:['Obsidian','⬛','obsidian'],sponge:['Sponge','🟨','sponge'],bookshelf:['Bookshelf','📚','bookshelf'],ironBlock:['Iron block','⬜','ironBlock'],goldBlock:['Gold block','🟨','goldBlock'],diamondBlock:['Diamond block','💎','diamondBlock'],redWool:['Red wool','🟥','redWool'],orangeWool:['Orange wool','🟧','orangeWool'],yellowWool:['Yellow wool','🟨','yellowWool'],limeWool:['Lime wool','🟩','limeWool'],greenWool:['Green wool','🟢','greenWool'],cyanWool:['Cyan wool','🩵','cyanWool'],blueWool:['Blue wool','🟦','blueWool'],purpleWool:['Purple wool','🟪','purpleWool'],whiteWool:['White wool','⬜','whiteWool']};
 const creativeBlocks=['grass','dirt','stone','cobblestone','wood','leaves','planks','sand','water','gravel','sandstone','brick','stoneBrick','mossStone','glass','ice','clay','obsidian','sponge','bookshelf','ironBlock','goldBlock','diamondBlock','redWool','orangeWool','yellowWool','limeWool','greenWool','cyanWool','blueWool','purpleWool','whiteWool'];
 const barItems=['grass','dirt','stone','wood','planks','leaves','sand','water','glass'];
@@ -51,13 +51,21 @@ function setupMats(){Object.assign(mats,{grassTop:material('grassTop',0x68aa45,2
 function faceMat(type,n){if(type==='grass')return n[1]===1?'grassTop':n[1]===-1?'dirt':'grassSide';if(type==='wood')return n[1]===0?'woodSide':'woodTop';return type;}
 const faces=[{n:[1,0,0],v:[[.5,-.5,-.5],[.5,.5,-.5],[.5,.5,.5],[.5,-.5,.5]]},{n:[-1,0,0],v:[[-.5,-.5,.5],[-.5,.5,.5],[-.5,.5,-.5],[-.5,-.5,-.5]]},{n:[0,1,0],v:[[-.5,.5,.5],[.5,.5,.5],[.5,.5,-.5],[-.5,.5,-.5]]},{n:[0,-1,0],v:[[-.5,-.5,-.5],[.5,-.5,-.5],[.5,-.5,.5],[-.5,-.5,.5]]},{n:[0,0,1],v:[[-.5,-.5,.5],[.5,-.5,.5],[.5,.5,.5],[-.5,.5,.5]]},{n:[0,0,-1],v:[[.5,-.5,-.5],[-.5,-.5,-.5],[-.5,.5,-.5],[.5,.5,-.5]]}];
 function buildWorld(){
- world.clear();for(let x=-64;x<64;x++)for(let z=-64;z<64;z++){const h=heightAt(x,z),beach=h<=4;for(let y=MIN_Y;y<=h;y++){let t=y===MIN_Y?'bedrock':y===h?(beach?'sand':'grass'):y>=h-3?(beach?'sand':'dirt'):'stone';if(y>MIN_Y+1&&y<h-2){const v=random(x*3+y,z*5-y,17)%265;if(v===0)t='coalOre';else if(v===1)t='ironOre';}setRaw(x,y,z,t);}if(h<5)for(let y=h+1;y<=5;y++)setRaw(x,y,z,'water');if(random(x,z,42)%173===0&&h>5&&Math.abs(x)>3&&Math.abs(z)>3){for(let y=h+1;y<=h+4;y++)setRaw(x,y,z,'wood');for(let dy=2;dy<=5;dy++)for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){if(Math.abs(dx)+Math.abs(dz)>3+(dy===5?-2:0))continue;if(get(x+dx,h+dy,z+dz)==='air')setRaw(x+dx,h+dy,z+dz,'leaves');}}}
+ world.clear();for(let x=-64;x<64;x++)for(let z=-64;z<64;z++){const h=heightAt(x,z),beach=h<=4;for(let y=MIN_Y;y<=h;y++){let t=y===MIN_Y?'bedrock':y===h?(beach?'sand':'grass'):y>=h-3?(beach?'sand':'dirt'):'stone';if(y>MIN_Y+1&&y<h-2){const v=random(x*3+y,z*5-y,17)%265;if(v===0)t='coalOre';else if(v===1)t='ironOre';}setRaw(x,y,z,t);}if(h<5)setRaw(x,h+1,z,'water');if(random(x,z,42)%173===0&&h>5&&Math.abs(x)>3&&Math.abs(z)>3){for(let y=h+1;y<=h+4;y++)setRaw(x,y,z,'wood');for(let dy=2;dy<=5;dy++)for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){if(Math.abs(dx)+Math.abs(dz)>3+(dy===5?-2:0))continue;if(get(x+dx,h+dy,z+dz)==='air')setRaw(x+dx,h+dy,z+dz,'leaves');}}}
+ // A small shallow pond beside spawn gives the player an easy, visible water test.
+ for(let x=4;x<=8;x++)for(let z=-2;z<=2;z++){
+  const dx=x-6,dz=z,dist=dx*dx+dz*dz;
+  if(dist>6.5)continue;
+  for(let y=MIN_Y;y<=6;y++)setRaw(x,y,z,y===MIN_Y?'bedrock':y===6?'sand':'stone');
+  for(let y=7;y<=MAX_Y;y++)setRaw(x,y,z,'air');
+  setRaw(x,7,z,'water');
+ }
  try{const save=JSON.parse(localStorage.getItem(STORE)||'null');if(Array.isArray(save?.changes))for(const [k,t] of save.changes){const p=k.split(',').map(Number);if(p.length===3&&p.every(Number.isFinite)){changes.set(k,t);setRaw(...p,t);}}if(save?.inventory)Object.assign(inventory,save.inventory);if(save?.player&&[save.player.x,save.player.y,save.player.z].every(Number.isFinite))Object.assign(player,save.player);else player.y=heightAt(0,0)+1.42;}catch(e){player.x=0;player.z=0;player.y=heightAt(0,0)+1.42;}
 }
 function buildChunk(cx,cz){
  const id=cx+','+cz,old=chunks.get(id);if(old){scene.remove(old);old.geometry.dispose();chunks.delete(id);}
  const names=Object.keys(mats),lists={};for(const n of names)lists[n]={p:[],norm:[],uv:[],idx:[]};
- for(let x=cx*CHUNK;x<(cx+1)*CHUNK;x++)for(let z=cz*CHUNK;z<(cz+1)*CHUNK;z++)for(let y=MIN_Y;y<=MAX_Y;y++){const t=get(x,y,z);if(t==='air')continue;for(const f of faces){const near=get(x+f.n[0],y+f.n[1],z+f.n[2]);if(near!=='air'&&(t!=='water'||near==='water'))continue;const l=lists[faceMat(t,f.n)];if(!l)continue;const base=l.p.length/3;for(let i=0;i<4;i++){const v=f.v[i];l.p.push(x+v[0],y+v[1],z+v[2]);l.norm.push(f.n[0],f.n[1],f.n[2]);l.uv.push(i===1||i===2?1:0,i>=2?1:0);}l.idx.push(base,base+1,base+2,base,base+2,base+3);}}
+ for(let x=cx*CHUNK;x<(cx+1)*CHUNK;x++)for(let z=cz*CHUNK;z<(cz+1)*CHUNK;z++)for(let y=MIN_Y;y<=MAX_Y;y++){const t=get(x,y,z);if(t==='air')continue;for(const f of faces){const near=get(x+f.n[0],y+f.n[1],z+f.n[2]);if(t==='water'?near!=='air':(near!=='air'&&near!=='water'))continue;const l=lists[faceMat(t,f.n)];if(!l)continue;const base=l.p.length/3;for(let i=0;i<4;i++){const v=f.v[i];l.p.push(x+v[0],y+v[1],z+v[2]);l.norm.push(f.n[0],f.n[1],f.n[2]);l.uv.push(i===1||i===2?1:0,i>=2?1:0);}l.idx.push(base,base+1,base+2,base,base+2,base+3);}}
  const g=new THREE.BufferGeometry(),p=[],n=[],uv=[],idx=[];let vo=0,io=0;
  names.forEach((name,i)=>{const l=lists[name];if(!l.idx.length)return;for(const v of l.p)p.push(v);for(const v of l.norm)n.push(v);for(const v of l.uv)uv.push(v);for(const v of l.idx)idx.push(v+vo);g.addGroup(io,l.idx.length,i);vo+=l.p.length/3;io+=l.idx.length;});
  if(!idx.length)return;g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(n,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeBoundingSphere();
@@ -125,52 +133,79 @@ function targetMob(distance=6){
  return root.userData.isMob?{mob:root,distance:hit.distance}:null;
 }
 
-let audioContext=null,audioMaster=null,soundEnabled=true,lastFootstep=0;
+let audioContext=null,audioMaster=null,soundEnabled=true,lastFootstep=0,soundPools={};
+const soundFiles={
+ mine:'https://sfxmint.com/dl/pickaxe-01.mp3',
+ stone:'https://sfxmint.com/dl/stone-block-01.mp3',
+ wood:'https://sfxmint.com/dl/wood-snap-01.mp3',
+ place:'https://sfxmint.com/dl/hammer-01.mp3',
+ water:'https://sfxmint.com/dl/water-splash-25.mp3',
+ steps:'https://sfxmint.com/dl/footsteps-gravel-19.mp3',
+ slime:'https://sfxmint.com/dl/creature-death-05.mp3'
+};
 function unlockAudio(){
- if(!soundEnabled)return;
  try{
   const Ctx=window.AudioContext||window.webkitAudioContext;
   if(!Ctx)return;
   if(!audioContext){
-   audioContext=new Ctx();audioMaster=audioContext.createGain();
-   audioMaster.gain.value=.2;audioMaster.connect(audioContext.destination);
+   audioContext=new Ctx();
+   const compressor=audioContext.createDynamicsCompressor();
+   compressor.threshold.value=-16;compressor.knee.value=12;compressor.ratio.value=4;
+   compressor.attack.value=.004;compressor.release.value=.22;
+   compressor.connect(audioContext.destination);
+   audioMaster=audioContext.createGain();
+   audioMaster.gain.value=2.0;
+   audioMaster.connect(compressor);
+   for(const [name,url] of Object.entries(soundFiles)){
+    soundPools[name]=Array.from({length:3},()=>{
+     const audio=new Audio();
+     audio.crossOrigin='anonymous';
+     audio.src=url;
+     audio.preload='auto';
+     audio.volume=1;
+     const source=audioContext.createMediaElementSource(audio);
+     source.connect(audioMaster);
+     audio.load();
+     return audio;
+    });
+   }
   }
   if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});
- }catch(e){console.warn('Audio is unavailable in this browser.',e);}
+ }catch(e){
+  console.warn('Sound system could not start:',e);
+ }
 }
-function tone(start,end,duration,wave='square',volume=.16){
- if(!soundEnabled||!audioContext||audioContext.state!=='running')return;
- const now=audioContext.currentTime,osc=audioContext.createOscillator(),gain=audioContext.createGain();
- osc.type=wave;
- osc.frequency.setValueAtTime(Math.max(35,start),now);
- osc.frequency.exponentialRampToValueAtTime(Math.max(35,end),now+duration);
- gain.gain.setValueAtTime(.0001,now);
- gain.gain.exponentialRampToValueAtTime(volume,now+.008);
- gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
- osc.connect(gain);gain.connect(audioMaster);osc.start(now);osc.stop(now+duration+.02);
-}
-function noise(duration=.07,volume=.12,cutoff=1800){
- if(!soundEnabled||!audioContext||audioContext.state!=='running')return;
- const count=Math.max(1,Math.floor(audioContext.sampleRate*duration));
- const buffer=audioContext.createBuffer(1,count,audioContext.sampleRate),data=buffer.getChannelData(0);
- for(let i=0;i<count;i++)data[i]=(Math.random()*2-1)*(1-i/count);
- const source=audioContext.createBufferSource(),filter=audioContext.createBiquadFilter(),gain=audioContext.createGain();
- source.buffer=buffer;filter.type='lowpass';filter.frequency.value=cutoff;
- gain.gain.setValueAtTime(volume,audioContext.currentTime);
- gain.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+duration);
- source.connect(filter);filter.connect(gain);gain.connect(audioMaster);source.start();
+function playClip(name,volume=1,rate=1){
+ if(!soundEnabled)return;
+ unlockAudio();
+ const pool=soundPools[name];if(!pool?.length)return;
+ const audio=pool.find(a=>a.paused||a.ended)||pool[0];
+ try{audio.pause();audio.currentTime=0;}catch(e){}
+ audio.volume=Math.max(0,Math.min(1,volume));
+ audio.playbackRate=rate;
+ audio.play().catch(()=>{});
 }
 function playSound(kind,block='stone'){
- if(!soundEnabled||!audioContext||audioContext.state!=='running')return;
+ if(!soundEnabled)return;
  if(kind==='break'){
-  if(block==='water'){tone(720,260,.13,'sine',.11);noise(.045,.035,900);}
-  else if(block==='glass'||block==='ice'){tone(1150,420,.12,'triangle',.1);noise(.035,.025,4500);}
-  else{noise(.075,.14,block==='leaves'?3200:block==='wood'||block==='planks'?1200:1900);tone(block==='wood'||block==='planks'?180:110,70,.09,'square',.045);}
- }else if(kind==='place'){tone(170,110,.07,'square',.09);noise(.04,.06,850);}
- else if(kind==='jump'){tone(220,440,.13,'triangle',.075);}
- else if(kind==='step'){noise(.045,.045,block==='grass'||block==='leaves'?950:500);}
- else if(kind==='mob'){tone(390,250,.17,'triangle',.055);tone(250,330,.12,'sine',.035);}
- else if(kind==='mobHit'){tone(520,190,.16,'square',.09);noise(.04,.05,1600);}
+  if(block==='water')playClip('water',1);
+  else if(block==='wood'||block==='planks'||block==='leaves')playClip('wood',1);
+  else if(block==='glass'||block==='ice')playClip('stone',.9,1.12);
+  else playClip('mine',1);
+ }else if(kind==='place'){
+  if(block==='water')playClip('water',.9,1.08);
+  else playClip('place',.9);
+ }else if(kind==='jump'){
+  playClip('steps',.72,1.12);
+ }else if(kind==='step'){
+  if(performance.now()-lastFootstep<420)return;
+  lastFootstep=performance.now();
+  playClip('steps',.88,1.0+Math.random()*.06);
+ }else if(kind==='mob'){
+  playClip('water',.28,1.18);
+ }else if(kind==='mobHit'){
+  playClip('slime',.82);
+ }
 }
 function toggleSound(){
  soundEnabled=!soundEnabled;
@@ -239,19 +274,29 @@ function resume(){ $('pauseScreen').classList.add('hidden');if(running)renderer.
 function target(distance=6){
  ray.setFromCamera(new THREE.Vector2(0,0),camera);
  const origin=ray.ray.origin,dir=ray.ray.direction;
- let x=Math.floor(origin.x+.5),y=Math.floor(origin.y+.5),z=Math.floor(origin.z+.5);
- const sx=dir.x>0?1:-1,sy=dir.y>0?1:-1,sz=dir.z>0?1:-1;
- const dx=Math.abs(dir.x)<1e-9?Infinity:Math.abs(1/dir.x),dy=Math.abs(dir.y)<1e-9?Infinity:Math.abs(1/dir.y),dz=Math.abs(dir.z)<1e-9?Infinity:Math.abs(1/dir.z);
- let tx=dir.x===0?Infinity:((sx>0?x+.5:x-.5)-origin.x)/dir.x;
- let ty=dir.y===0?Infinity:((sy>0?y+.5:y-.5)-origin.y)/dir.y;
- let tz=dir.z===0?Infinity:((sz>0?z+.5:z-.5)-origin.z)/dir.z;
- let distanceTravelled=0,nx=0,ny=0,nz=0;
- for(let i=0;i<512&&distanceTravelled<=distance;i++){
+ const stepSize=.025;
+ let previous=null;
+ for(let travel=0;travel<=distance;travel+=stepSize){
+  const x=Math.floor(origin.x+dir.x*travel+.5);
+  const y=Math.floor(origin.y+dir.y*travel+.5);
+  const z=Math.floor(origin.z+dir.z*travel+.5);
   const type=get(x,y,z);
-  if(type!=='air')return{x,y,z,type,distance:distanceTravelled,face:{normal:new THREE.Vector3(nx,ny,nz)}};
-  if(tx<=ty&&tx<=tz){distanceTravelled=tx;x+=sx;tx+=dx;nx=-sx;ny=0;nz=0;}
-  else if(ty<=tz){distanceTravelled=ty;y+=sy;ty+=dy;nx=0;ny=-sy;nz=0;}
-  else{distanceTravelled=tz;z+=sz;tz+=dz;nx=0;ny=0;nz=-sz;}
+  if(type!=='air'){
+   let nx=0,ny=0,nz=0;
+   if(previous){
+    const dx=x-previous.x,dy=y-previous.y,dz=z-previous.z;
+    if(Math.abs(dx)>=Math.abs(dy)&&Math.abs(dx)>=Math.abs(dz))nx=-Math.sign(dx);
+    else if(Math.abs(dy)>=Math.abs(dz))ny=-Math.sign(dy);
+    else nz=-Math.sign(dz);
+   }else{
+    const ax=Math.abs(dir.x),ay=Math.abs(dir.y),az=Math.abs(dir.z);
+    if(ax>=ay&&ax>=az)nx=-Math.sign(dir.x);
+    else if(ay>=az)ny=-Math.sign(dir.y);
+    else nz=-Math.sign(dir.z);
+   }
+   return{x,y,z,type,distance:travel,face:{normal:new THREE.Vector3(nx,ny,nz)}};
+  }
+  previous={x,y,z};
  }
  return null;
 }
@@ -274,7 +319,7 @@ function placeBlock(){
 function move(dt){
  const f=(pressed.KeyW||pressed.ArrowUp?1:0)-(pressed.KeyS||pressed.ArrowDown?1:0),s=(pressed.KeyD||pressed.ArrowRight?1:0)-(pressed.KeyA||pressed.ArrowLeft?1:0),mag=Math.hypot(f,s)||1,speed=pressed.ShiftLeft||pressed.ShiftRight?8.5:5.1;
  const dx=(-Math.sin(yaw)*f+Math.cos(yaw)*s)/mag*speed*dt,dz=(-Math.cos(yaw)*f-Math.sin(yaw)*s)/mag*speed*dt,ox=player.x,oz=player.z;player.x+=dx;if(collision(player.x,player.y,player.z))player.x=ox;player.z+=dz;if(collision(player.x,player.y,player.z))player.z=oz;
- if(pressed.Space&&player.grounded){player.vy=7.2;player.grounded=false;pressed.Space=false;playSound('jump');}const moving=!!(f||s);if(moving&&player.grounded&&performance.now()-lastFootstep>340){lastFootstep=performance.now();playSound('step',get(Math.floor(player.x),Math.floor(player.y-1),Math.floor(player.z)));}const oy=player.y;player.vy-=19*dt;player.y+=player.vy*dt;if(collision(player.x,player.y,player.z)){player.y=oy;if(player.vy<0)player.grounded=true;player.vy=0;}else player.grounded=false;
+ if(pressed.Space&&player.grounded){player.vy=7.2;player.grounded=false;pressed.Space=false;playSound('jump');}const moving=!!(f||s);if(moving&&player.grounded)playSound('step',get(Math.floor(player.x),Math.floor(player.y-1),Math.floor(player.z)));const oy=player.y;player.vy-=19*dt;player.y+=player.vy*dt;if(collision(player.x,player.y,player.z)){player.y=oy;if(player.vy<0)player.grounded=true;player.vy=0;}else player.grounded=false;
  player.x=Math.max(-63,Math.min(63,player.x));player.z=Math.max(-63,Math.min(63,player.z));if(player.y<MIN_Y-5){player.x=0;player.z=0;player.y=heightAt(0,0)+1.42;player.vy=0;}camera.position.set(player.x,player.y+.55,player.z);camera.rotation.set(pitch,yaw,0);
 }
 function dayNight(dt){clock+=dt;sun.intensity=1.75;hemi.intensity=1.55;sun.position.set(-32,58,24);sunOrb.position.set(-32,58,24);moonOrb.visible=false;if(scene.fog)scene.fog.color.set(0x87c5ed);for(const c of clouds)c.position.x+=Math.sin(clock*.018+c.position.z)*dt*.08;}
