@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 const $=id=>document.getElementById(id),WORLD=80,CHUNK=16,MIN_Y=-4,MAX_Y=24,STORE='blockworld-save-v2';
 const info={grass:['Grass','🟩','grass'],dirt:['Dirt','🟫','dirt'],stone:['Stone','⬜','stone'],wood:['Oak log','🪵','wood'],leaves:['Leaves','🌿','leaves'],planks:['Oak planks','🟨','planks'],sand:['Sand','🟨','sand'],coalOre:['Coal ore','⚫','coal'],ironOre:['Iron ore','🟤','ironOre'],water:['Water','🟦',null],bedrock:['Bedrock','⬛',null],cobblestone:['Cobblestone','🪨','cobblestone'],gravel:['Gravel','▫️','gravel'],sandstone:['Sandstone','🟨','sandstone'],brick:['Bricks','🧱','brick'],stoneBrick:['Stone bricks','◻️','stoneBrick'],mossStone:['Mossy stone','🪨','mossStone'],glass:['Glass','🔹','glass'],ice:['Ice','🧊','ice'],snow:['Snow','⬜','snow'],clay:['Clay','🟫','clay'],obsidian:['Obsidian','⬛','obsidian'],sponge:['Sponge','🟨','sponge'],bookshelf:['Bookshelf','📚','bookshelf'],ironBlock:['Iron block','⬜','ironBlock'],goldBlock:['Gold block','🟨','goldBlock'],diamondBlock:['Diamond block','💎','diamondBlock'],redWool:['Red wool','🟥','redWool'],orangeWool:['Orange wool','🟧','orangeWool'],yellowWool:['Yellow wool','🟨','yellowWool'],limeWool:['Lime wool','🟩','limeWool'],greenWool:['Green wool','🟢','greenWool'],cyanWool:['Cyan wool','🩵','cyanWool'],blueWool:['Blue wool','🟦','blueWool'],purpleWool:['Purple wool','🟪','purpleWool'],whiteWool:['White wool','⬜','whiteWool']};
-const creativeBlocks=['grass','dirt','stone','cobblestone','wood','leaves','planks','sand','gravel','sandstone','brick','stoneBrick','mossStone','glass','ice','snow','clay','obsidian','sponge','bookshelf','ironBlock','goldBlock','diamondBlock','redWool','orangeWool','yellowWool','limeWool','greenWool','cyanWool','blueWool','purpleWool','whiteWool'];
-const barItems=['grass','dirt','stone','wood','planks','leaves','sand','brick','glass'];
+const creativeBlocks=['grass','dirt','stone','cobblestone','wood','leaves','planks','sand','water','gravel','sandstone','brick','stoneBrick','mossStone','glass','ice','snow','clay','obsidian','sponge','bookshelf','ironBlock','goldBlock','diamondBlock','redWool','orangeWool','yellowWool','limeWool','greenWool','cyanWool','blueWool','purpleWool','whiteWool'];
+const barItems=['grass','dirt','stone','wood','planks','leaves','sand','water','glass'];
 const inventory={grass:32,dirt:32,stone:32,wood:16,planks:12,leaves:10,sand:8,sticks:0,coal:0,ironOre:0,pickaxeTier:0,shovelTier:0};
 const packColors={},pressed=Object.create(null),world=new Map(),changes=new Map(),chunks=new Map(),mats={},textures={},slimes=[],clouds=[];
 let scene,camera,renderer,sun,hemi,sunOrb,moonOrb,selectionBox,worldObjects=[],selected=0,running=false,locked=false,panel=false;
@@ -18,6 +18,21 @@ function texture(name,base,seed,style){
  else if(style==='grassSide'){fill(0,0,16,16,'#805334');for(let i=0;i<52;i++)fill((i*7+seed)%16,(i*11)%16,1,1,i%2?'#95633c':'#70472f');fill(0,0,16,3,'#57983b');fill(0,2,16,1,'#6cac45');for(let x=0;x<16;x++)if((x*7+seed)%5===0)fill(x,3,1,1,'#57983b');}
  else if(style==='dirt'){for(let i=0;i<58;i++)fill((i*7+seed*3)%16,(i*11+seed)%16,1+(i%7===0?1:0),1,i%3===0?'#9a6944':i%3===1?'#6c472e':'#875a38');}
  else if(style==='stone'||style==='coal'||style==='iron'){for(let i=0;i<50;i++)fill((i*9+seed)%16,(i*5+seed*3)%16,1+(i%9===0?1:0),1,i%3===0?'#999da0':i%3===1?'#73797c':'#858b8e');if(style!=='stone'){const ore=style==='coal'?'#30363a':'#c4a17d';for(let i=0;i<13;i++){const x=(i*7+seed*2)%15,y=(i*11+4+seed)%15;fill(x,y,2,2,ore);}}}
+ else if(style==='cobble'||style==='stoneBrick'||style==='mossStone'){
+  const palette=style==='mossStone'?['#737c6a','#5d6858','#829078','#4d5749']:['#73797b','#8e9494','#62696b','#a0a3a0'];
+  for(let y=0,row=0;y<16;y+=4,row++){for(let x=(row%2?-2:0);x<16;x+=6){const xx=(x+16)%16,w=4+(row+Math.floor(x/6))%3;fill(xx,y,w,3,palette[(row+Math.floor(x/6)+2)%palette.length]);fill(xx,y,w,1,palette[0]);}}
+  if(style==='stoneBrick'){for(const y of [0,5,10,15])fill(0,y,16,1,'#555d60');for(const x of [7,15]){fill(x,0,1,5,'#555d60');fill((x+8)%16,5,1,5,'#555d60');fill(x,10,1,5,'#555d60');}}
+  if(style==='mossStone')for(let i=0;i<22;i++){const x=(i*7+seed)%16,y=(i*11+seed*3)%16;fill(x,y,2,1,i%2?'#477344':'#8aa16c');}
+ }
+ else if(style==='gravel'){fill(0,0,16,16,'#99958a');for(let i=0;i<86;i++){const x=(i*7+seed*3)%16,y=(i*11+seed)%16;fill(x,y,1+(i%11===0?1:0),1,i%4===0?'#c0b9a8':i%4===1?'#77776f':i%4===2?'#aaa69b':'#88877f');}}
+ else if(style==='sandstone'){fill(0,0,16,16,'#d7c18a');for(const y of [3,8,13])fill(0,y,16,1,'#b99f68');for(let i=0;i<30;i++)fill((i*7+seed)%16,(i*5+2)%16,2,1,i%2?'#e7d5a8':'#c8af77');}
+ else if(style==='snow'){fill(0,0,16,16,'#e8eef0');for(let i=0;i<38;i++){const x=(i*7+seed)%16,y=(i*11+seed*2)%16;fill(x,y,1+(i%9===0?1:0),1,i%3===0?'#cbdce5':i%3===1?'#ffffff':'#dbe7ec');}}
+ else if(style==='clay'){fill(0,0,16,16,'#9b8f91');for(let i=0;i<45;i++)fill((i*7+seed)%16,(i*11+seed*3)%16,1,1,i%2?'#b0a3a4':'#827a7e');}
+ else if(style==='obsidian'){fill(0,0,16,16,'#282236');for(let i=0;i<35;i++){const x=(i*7+seed)%16,y=(i*11+seed*2)%16;fill(x,y,1,1,i%3===0?'#65517f':i%3===1?'#171623':'#3d3158');}}
+ else if(style==='sponge'){fill(0,0,16,16,'#d3c35a');for(let i=0;i<35;i++){const x=(i*7+seed)%15,y=(i*11+seed*2)%15;fill(x,y,2,2,i%2?'#ac9b3e':'#eadb83');fill(x,y,1,1,'#8b7d34');}}
+ else if(style==='bookshelf'){fill(0,0,16,16,'#80512d');for(const y of [0,6,12]){fill(0,y,16,2,'#b58245');for(let x=1;x<16;x+=3){fill(x,y+2,2,3,['#8d3932','#31558a','#c4a23d','#477447'][(x+seed)%4]);fill(x,y+2,1,1,'#e0c58a');}}}
+ else if(style==='metal'||style==='metalGold'||style==='diamond'){const base=style==='metal'?'#b7bdc0':style==='metalGold'?'#dfb72e':'#45c4bd';fill(0,0,16,16,base);for(let i=0;i<20;i++){const x=(i*7+seed)%16,y=(i*11+seed*2)%16;fill(x,y,1,1,i%2?'#ffffff':'#6f7779');}fill(1,1,14,1,style==='metal'?'#eff3f3':style==='metalGold'?'#fff0a3':'#a4f2e9');}
+ else if(style==='ice'){fill(0,0,16,16,'#9dd8ed');for(let i=0;i<24;i++){const x=(i*7+seed)%16,y=(i*11+seed*2)%16;fill(x,y,1,3,i%2?'#e5fbff':'#68b5d4');}}
  else if(style==='woodSide'){fill(0,0,16,16,'#87572f');for(let x=1;x<16;x+=4){fill(x,0,1,16,'#684426');fill(x+1,0,1,16,'#a87642');}for(let y=3;y<16;y+=6)fill(0,y,16,1,'#76502f');}
  else if(style==='woodTop'){fill(0,0,16,16,'#b68b55');for(let y=0;y<16;y++)for(let x=0;x<16;x++)if(Math.round(Math.abs(x-7.5)+Math.abs(y-7.5))%4===0)fill(x,y,1,1,'#8a6039');fill(7,7,2,2,'#d1aa72');}
  else if(style==='planks'){fill(0,0,16,16,'#bd9257');for(const y of [0,5,10,15])fill(0,y,16,1,'#815b36');for(const y of [1,6,11]){fill(4,y,1,4,'#9c713e');fill(12,y,1,4,'#a97b45');}for(let i=0;i<12;i++)fill((i*7+seed)%16,(i*3+2)%16,2,1,'#d0a66b');}
@@ -31,7 +46,7 @@ function texture(name,base,seed,style){
  const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestMipmapNearestFilter;t.colorSpace=THREE.SRGBColorSpace;textures[name]=t;return t;
 }
 function material(name,color,seed,style){const o={map:texture(name,color,seed,style)};if(name==='leaves')o.alphaTest=.12;if(name==='water'){o.transparent=true;o.opacity=.78;o.depthWrite=false;}return new THREE.MeshLambertMaterial(o);}
-function setupMats(){Object.assign(mats,{grassTop:material('grassTop',0x68aa45,2,'grassTop'),grassSide:material('grassSide',0x805638,3,'grassSide'),dirt:material('dirt',0x805638,4,'dirt'),stone:material('stone',0x858b91,5,'stone'),woodSide:material('woodSide',0x80522d,6,'woodSide'),woodTop:material('woodTop',0xb18a59,7,'woodTop'),leaves:material('leaves',0x397d3d,8,'leaves'),planks:material('planks',0xb88750,9,'planks'),sand:material('sand',0xd2bf83,10,'sand'),coalOre:material('coalOre',0x858b91,11,'coal'),ironOre:material('ironOre',0x858b91,12,'iron'),water:material('water',0x408fc2,13,'water'),bedrock:material('bedrock',0x34383b,14,'stone'),cobblestone:material('cobblestone',0x777d80,15,'stone'),gravel:material('gravel',0x9a9185,16,'dirt'),sandstone:material('sandstone',0xd2b77a,17,'sand'),brick:material('brick',0xa34f3c,18,'brick'),stoneBrick:material('stoneBrick',0x8c9293,19,'stone'),mossStone:material('mossStone',0x718467,20,'leaves'),glass:material('glass',0xb6dbe8,21,'glass'),ice:material('ice',0x9dd8ed,22,'glass'),snow:material('snow',0xe6edf1,23,'sand'),clay:material('clay',0x9b8f91,24,'stone'),obsidian:material('obsidian',0x30243f,25,'stone'),sponge:material('sponge',0xd8c65b,26,'wool'),bookshelf:material('bookshelf',0x8a613b,27,'woodSide'),ironBlock:material('ironBlock',0xc9ccca,28,'stone'),goldBlock:material('goldBlock',0xe5c34a,29,'wool'),diamondBlock:material('diamondBlock',0x54c9bf,30,'wool'),redWool:material('redWool',0xb63d36,31,'wool'),orangeWool:material('orangeWool',0xe18a35,32,'wool'),yellowWool:material('yellowWool',0xe6d04f,33,'wool'),limeWool:material('limeWool',0x9ecb43,34,'wool'),greenWool:material('greenWool',0x4c9b46,35,'wool'),cyanWool:material('cyanWool',0x55b8b0,36,'wool'),blueWool:material('blueWool',0x466bb3,37,'wool'),purpleWool:material('purpleWool',0x7c54a2,38,'wool'),whiteWool:material('whiteWool',0xe6e6df,39,'wool')});
+function setupMats(){Object.assign(mats,{grassTop:material('grassTop',0x68aa45,2,'grassTop'),grassSide:material('grassSide',0x805638,3,'grassSide'),dirt:material('dirt',0x805638,4,'dirt'),stone:material('stone',0x858b91,5,'stone'),woodSide:material('woodSide',0x80522d,6,'woodSide'),woodTop:material('woodTop',0xb18a59,7,'woodTop'),leaves:material('leaves',0x397d3d,8,'leaves'),planks:material('planks',0xb88750,9,'planks'),sand:material('sand',0xd2bf83,10,'sand'),coalOre:material('coalOre',0x858b91,11,'coal'),ironOre:material('ironOre',0x858b91,12,'iron'),water:material('water',0x408fc2,13,'water'),bedrock:material('bedrock',0x34383b,14,'stone'),cobblestone:material('cobblestone',0x777d80,15,'cobble'),gravel:material('gravel',0x9a9185,16,'gravel'),sandstone:material('sandstone',0xd2b77a,17,'sandstone'),brick:material('brick',0xa34f3c,18,'brick'),stoneBrick:material('stoneBrick',0x8c9293,19,'stoneBrick'),mossStone:material('mossStone',0x718467,20,'mossStone'),glass:material('glass',0xb6dbe8,21,'glass'),ice:material('ice',0x9dd8ed,22,'ice'),snow:material('snow',0xe6edf1,23,'snow'),clay:material('clay',0x9b8f91,24,'clay'),obsidian:material('obsidian',0x30243f,25,'obsidian'),sponge:material('sponge',0xd8c65b,26,'sponge'),bookshelf:material('bookshelf',0x8a613b,27,'bookshelf'),ironBlock:material('ironBlock',0xc9ccca,28,'metal'),goldBlock:material('goldBlock',0xe5c34a,29,'metalGold'),diamondBlock:material('diamondBlock',0x54c9bf,30,'diamond'),redWool:material('redWool',0xb63d36,31,'wool'),orangeWool:material('orangeWool',0xe18a35,32,'wool'),yellowWool:material('yellowWool',0xe6d04f,33,'wool'),limeWool:material('limeWool',0x9ecb43,34,'wool'),greenWool:material('greenWool',0x4c9b46,35,'wool'),cyanWool:material('cyanWool',0x55b8b0,36,'wool'),blueWool:material('blueWool',0x466bb3,37,'wool'),purpleWool:material('purpleWool',0x7c54a2,38,'wool'),whiteWool:material('whiteWool',0xe6e6df,39,'wool')});
  mats.glass.transparent=true;mats.glass.opacity=.42;mats.glass.depthWrite=false;mats.ice.transparent=true;mats.ice.opacity=.68;mats.ice.depthWrite=false;}
 function faceMat(type,n){if(type==='grass')return n[1]===1?'grassTop':n[1]===-1?'dirt':'grassSide';if(type==='wood')return n[1]===0?'woodSide':'woodTop';return type;}
 const faces=[{n:[1,0,0],v:[[.5,-.5,-.5],[.5,.5,-.5],[.5,.5,.5],[.5,-.5,.5]]},{n:[-1,0,0],v:[[-.5,-.5,.5],[-.5,.5,.5],[-.5,.5,-.5],[-.5,-.5,-.5]]},{n:[0,1,0],v:[[-.5,.5,.5],[.5,.5,.5],[.5,.5,-.5],[-.5,.5,-.5]]},{n:[0,-1,0],v:[[-.5,-.5,-.5],[.5,-.5,-.5],[.5,-.5,.5],[-.5,-.5,.5]]},{n:[0,0,1],v:[[-.5,-.5,.5],[.5,-.5,.5],[.5,.5,.5],[-.5,.5,.5]]},{n:[0,0,-1],v:[[.5,-.5,-.5],[-.5,-.5,-.5],[-.5,.5,-.5],[.5,.5,-.5]]}];
@@ -66,21 +81,52 @@ function init(){
   setupMats();buildWorld();applyPackColors();for(let x=-3;x<=2;x++)for(let z=-3;z<=2;z++)buildChunk(x,z);worldObjects=[...chunks.values()];makeClouds();camera.position.set(player.x,player.y+.55,player.z);return true;
  }catch(e){console.error(e);$('errorText').textContent='3D graphics could not start. Enable browser hardware acceleration and reload.';$('errorScreen').classList.remove('hidden');return false;}
 }
-const icon=item=>info[item]?.[1]||'📦';
-const count=item=>'∞';
-function drawBar(){const root=$('hotbar');root.innerHTML='';barItems.forEach((item,i)=>{const el=document.createElement('div');el.className='slot'+(selected===i?' selected':'');el.innerHTML='<span class="num">'+(i+1)+'</span><strong>'+icon(item)+'</strong><span class="amount">∞</span>';el.title=info[item]?.[0]||item;el.onclick=()=>{selected=i;drawBar();};root.appendChild(el);});}
+function drawBlockIcon(canvas,item){
+ const ctx=canvas.getContext('2d');ctx.clearRect(0,0,32,34);ctx.imageSmoothingEnabled=false;
+ const faces=[
+  {key:faceMat(item,[0,1,0]),pts:[[16,2],[30,9],[16,17],[2,9]],box:[2,2,28,15]},
+  {key:faceMat(item,[0,0,1]),pts:[[2,9],[16,17],[16,32],[2,24]],box:[2,9,14,23]},
+  {key:faceMat(item,[1,0,0]),pts:[[16,17],[30,9],[30,24],[16,32]],box:[16,9,14,23]}
+ ];
+ for(const face of faces){
+  ctx.save();ctx.beginPath();face.pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();
+  const tex=textures[face.key]?.image;
+  if(tex)ctx.drawImage(tex,face.box[0],face.box[1],face.box[2],face.box[3]);
+  else {ctx.fillStyle='#858585';ctx.fillRect(face.box[0],face.box[1],face.box[2],face.box[3]);}
+  if(item==='water') {ctx.fillStyle='#4da9df55';ctx.fillRect(face.box[0],face.box[1],face.box[2],face.box[3]);}
+  ctx.restore();
+  ctx.beginPath();face.pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.strokeStyle='#24241f';ctx.lineWidth=1;ctx.stroke();
+ }
+ if(packColors[item]){
+  ctx.save();ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.22;ctx.fillStyle=packColors[item];ctx.fillRect(0,0,32,34);ctx.restore();
+ }
+}
+function drawBar(){
+ const root=$('hotbar');root.innerHTML='';
+ barItems.forEach((item,i)=>{
+  const el=document.createElement('button');el.type='button';el.className='slot'+(selected===i?' selected':'');
+  const number=document.createElement('span');number.className='num';number.textContent=String(i+1);
+  const canvas=document.createElement('canvas');canvas.className='block-icon';canvas.width=32;canvas.height=34;canvas.setAttribute('aria-hidden','true');
+  const amount=document.createElement('span');amount.className='amount';amount.textContent='∞';
+  el.title=(info[item]?.[0]||item)+(item==='water'?' — breakable and placeable water block':'');
+  el.append(number,canvas,amount);el.onclick=()=>{selected=i;drawBar();};root.appendChild(el);drawBlockIcon(canvas,item);
+ });
+}
 function renderInventory(){
  const root=$('inventoryGrid');root.innerHTML='';
  for(const item of creativeBlocks){
-  const b=document.createElement('button');b.className='inventory-item';
-  b.innerHTML='<strong>'+icon(item)+'</strong><span>'+info[item][0]+'</span><small>Unlimited</small>';
+  const b=document.createElement('button');b.className='inventory-item';b.type='button';
+  const canvas=document.createElement('canvas');canvas.className='block-preview';canvas.width=32;canvas.height=34;
+  const name=document.createElement('span');name.textContent=info[item][0];
+  const unlimited=document.createElement('small');unlimited.textContent='Unlimited';
+  b.append(canvas,name,unlimited);drawBlockIcon(canvas,item);
   b.title='Put '+info[item][0]+' in selected hotbar slot';
   b.onclick=()=>{barItems[selected]=item;drawBar();$('craftStatus').textContent=info[item][0]+' selected for slot '+(selected+1)+'.';};
   root.appendChild(b);
  }
- $('craftStatus').textContent='Choose a block to replace the selected hotbar slot. All blocks are unlimited.';
+ $('craftStatus').textContent='Choose a block to replace the selected hotbar slot. Water is a placeable, breakable block. All blocks are unlimited.';
 }
-function showInventory(){panel=true;mining=false;document.exitPointerLock?.();$('inventoryScreen').classList.remove('hidden');renderInventory();}
+function showInventory(){panel=true;document.exitPointerLock?.();$('inventoryScreen').classList.remove('hidden');renderInventory();}
 function hideInventory(){panel=false;$('inventoryScreen').classList.add('hidden');if(running)renderer.domElement.requestPointerLock();}
 function pause(){if(running&&!panel)$('pauseScreen').classList.remove('hidden');}
 function resume(){ $('pauseScreen').classList.add('hidden');if(running)renderer.domElement.requestPointerLock();}
@@ -103,12 +149,12 @@ function move(dt){
 function dayNight(dt){clock+=dt;const level=(Math.sin(clock*.035)+1)/2,bright=.18+level*.82,angle=clock*.035;sun.intensity=.22+1.55*bright;hemi.intensity=.5+1.2*bright;sun.position.set(Math.cos(angle)*42,Math.sin(angle)*48,Math.sin(angle*.7)*34);sunOrb.position.copy(sun.position.clone().normalize().multiplyScalar(75));moonOrb.position.copy(sunOrb.position.clone().negate());sunOrb.visible=sun.position.y>0;moonOrb.visible=sun.position.y<=0;const sky=new THREE.Color(0x111b35).lerp(new THREE.Color(0x87c5ed),bright);if(level<.18)sky.lerp(new THREE.Color(0xf0a36e),(.18-level)*2.5);scene.background.copy(sky);scene.fog.color.copy(sky);for(const c of clouds)c.position.x+=Math.sin(clock*.025+c.position.z)*dt*.15;}
 function updateOutline(){const h=target(6);if(!h){selectionBox.visible=false;return;}const [x,y,z]=hitBlock(h,true);if(get(x,y,z)==='air'){selectionBox.visible=false;return;}selectionBox.visible=true;selectionBox.position.set(x,y,z);}
 function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000||0,.04);last=now;if(locked&&running&&!panel){move(dt);updateOutline();}else{selectionBox.visible=false;}dayNight(dt);renderer.render(scene,camera);fpsFrames++;if(now-fpsAt>1000){$('fps').textContent=fpsFrames+' FPS';fpsFrames=0;fpsAt=now;$('coords').textContent=Math.floor(player.x)+', '+Math.floor(player.y)+', '+Math.floor(player.z);}if(now-saveAt>12000&&running){saveWorld();saveAt=now;}}
-function applyPack(file){const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(String(reader.result));if(!data?.colors||typeof data.colors!=='object')throw Error('format');let n=0;for(const [name,color] of Object.entries(data.colors)){if(!Object.prototype.hasOwnProperty.call(info,name)||typeof color!=='string'||!/^#[0-9a-f]{6}$/i.test(color))continue;packColors[name]=color;const k=name==='grass'?'grassTop':name==='wood'?'woodSide':name;if(mats[k])mats[k].color.set(color);if(name==='grass')mats.grassSide.color.set(color);n++;}saveWorld();$('packStatus').textContent='Applied '+n+' block colours.';}catch(e){$('packStatus').textContent='Invalid BlockWorld colour pack.';}};reader.readAsText(file);}
+function applyPack(file){const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(String(reader.result));if(!data?.colors||typeof data.colors!=='object')throw Error('format');let n=0;for(const [name,color] of Object.entries(data.colors)){if(!Object.prototype.hasOwnProperty.call(info,name)||typeof color!=='string'||!/^#[0-9a-f]{6}$/i.test(color))continue;packColors[name]=color;const k=name==='grass'?'grassTop':name==='wood'?'woodSide':name;if(mats[k])mats[k].color.set(color);if(name==='grass')mats.grassSide.color.set(color);n++;}saveWorld();$('packStatus').textContent='Applied '+n+' block colours.';}catch(e){$('packStatus').textContent='Invalid Minecraft colour pack.';}};reader.readAsText(file);}
 drawBar();if(init())requestAnimationFrame(frame);
 document.addEventListener('keydown',e=>{pressed[e.code]=true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(/^Digit[1-9]$/.test(e.code)){selected=+e.code.slice(5)-1;drawBar();}if((e.code==='KeyE'||e.code==='KeyB')&&running&&!panel)showInventory();else if(e.code==='Escape'&&panel)hideInventory();});
 document.addEventListener('keyup',e=>pressed[e.code]=false);
 document.addEventListener('mousemove',e=>{if(!locked||panel)return;yaw-=e.movementX*.0022;pitch=Math.max(-1.52,Math.min(1.52,pitch-e.movementY*.0022));});
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer?.domElement;if(running&&!panel)pause();});
+document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer?.domElement;if(running&&!panel&&!locked)pause();});
 document.addEventListener('mousedown',e=>{if(!locked||panel||!running)return;if(e.button===0){const h=target(6);if(h){const [x,y,z]=hitBlock(h,true);breakBlock(x,y,z,get(x,y,z));}}if(e.button===2)placeBlock();});
 
 document.addEventListener('contextmenu',e=>e.preventDefault());
