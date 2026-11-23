@@ -14,20 +14,14 @@
   <div id="hud">
     <div class="crosshair"><i></i><b></b></div>
     <div id="hotbar" aria-label="Nine-slot hotbar"></div>
-    <div id="breakMeter" class="break-meter" aria-hidden="true"><div id="breakFill"></div></div>
-    <button id="soundToggle" class="sound-toggle" type="button">SOUND: ON</button>
     <div id="debugData" hidden><span id="fps">-- FPS</span><span id="coords">0, 0, 0</span></div>
-    <div class="actions" aria-hidden="true">
-      <button id="saveBtn" title="Save world">SAVE</button>
-      <button id="fullscreenBtn" title="Fullscreen">⛶</button>
-    </div>
   </div>
 
   <section id="startScreen" class="screen">
     <div class="start-card">
       <div class="logo-title">MINECRAFT</div>
       <div class="subtitle">CLASSIC CREATIVE</div>
-      <button class="classic-button" id="playBtn">Create a new world</button>
+      <button class="classic-button" id="playBtn">Play Classic Creative</button>
       <div class="start-help">Build freely in a block world. No downloads or account required.</div>
       <div class="start-controls">WASD Move · Mouse Look · Space Jump · B Select Block</div>
     </div>
@@ -38,7 +32,8 @@
       <div class="panel-title">Game menu</div>
       <button class="classic-button" id="resumeBtn">Back to game</button>
       <button class="classic-button" id="pauseSaveBtn">Save world</button>
-      <div class="control-note">WASD move · Mouse look · Space jump · Left click mine · Right click place<br>1–9 or mouse wheel select · Middle click pick block · B blocks · M sound · F fog · Esc resume</div>
+      <button class="classic-button sound-toggle" id="soundToggle" type="button">Sound: ON</button>
+      <div class="control-note">WASD move · Mouse look · Space jump · Left click mine · Right click place<br>1–9 / wheel select · Middle click pick · B blocks · M sound · F fog · G fullscreen · Esc resume</div>
     </div>
   </section>
 
