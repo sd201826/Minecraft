@@ -17,13 +17,15 @@ Enable **Settings → Pages → Deploy from a branch → main → /(root)**. Ope
 | Left click | Break the block under the crosshair |
 | Right click | Place the selected block |
 | 1–9 | Pick a hotbar slot |
-| B or E | Open the 32-block creative library |
+| B or E | Open the 33-block creative library |
 | Esc | Release mouse / pause |
 
 ## Included
 
-- Original pixel-style 16×16 block textures
-- 32 selectable creative building blocks and an unlimited hotbar
+- Original 16×16 pixel textures with distinct cobblestone, gravel, sandstone, stone brick, ice, snow, obsidian, sponge, bookshelf and metal patterns
+- Textured isometric block icons in a classic square-slot hotbar and inventory
+- Water is a selectable, placeable and breakable block
+- 33 selectable creative building blocks and an unlimited hotbar
 - Procedural hills, trees, water, beaches and ore-filled ground
 - Chunk-based mesh rendering
 - First-person movement, collision, jumping and mouse look
