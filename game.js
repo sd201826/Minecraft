@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-const $=id=>document.getElementById(id),WORLD=80,CHUNK=16,MIN_Y=-4,MAX_Y=24,STORE='blockworld-save-v2';
+const $=id=>document.getElementById(id),WORLD=128,CHUNK=16,MIN_Y=-4,MAX_Y=32,STORE='blockworld-save-v2';
 const info={grass:['Grass','🟩','grass'],dirt:['Dirt','🟫','dirt'],stone:['Stone','⬜','stone'],wood:['Oak log','🪵','wood'],leaves:['Leaves','🌿','leaves'],planks:['Oak planks','🟨','planks'],sand:['Sand','🟨','sand'],coalOre:['Coal ore','⚫','coal'],ironOre:['Iron ore','🟤','ironOre'],water:['Water','🟦',null],bedrock:['Bedrock','⬛',null],cobblestone:['Cobblestone','🪨','cobblestone'],gravel:['Gravel','▫️','gravel'],sandstone:['Sandstone','🟨','sandstone'],brick:['Bricks','🧱','brick'],stoneBrick:['Stone bricks','◻️','stoneBrick'],mossStone:['Mossy stone','🪨','mossStone'],glass:['Glass','🔹','glass'],ice:['Ice','🧊','ice'],snow:['Snow','⬜','snow'],clay:['Clay','🟫','clay'],obsidian:['Obsidian','⬛','obsidian'],sponge:['Sponge','🟨','sponge'],bookshelf:['Bookshelf','📚','bookshelf'],ironBlock:['Iron block','⬜','ironBlock'],goldBlock:['Gold block','🟨','goldBlock'],diamondBlock:['Diamond block','💎','diamondBlock'],redWool:['Red wool','🟥','redWool'],orangeWool:['Orange wool','🟧','orangeWool'],yellowWool:['Yellow wool','🟨','yellowWool'],limeWool:['Lime wool','🟩','limeWool'],greenWool:['Green wool','🟢','greenWool'],cyanWool:['Cyan wool','🩵','cyanWool'],blueWool:['Blue wool','🟦','blueWool'],purpleWool:['Purple wool','🟪','purpleWool'],whiteWool:['White wool','⬜','whiteWool']};
-const creativeBlocks=['grass','dirt','stone','cobblestone','wood','leaves','planks','sand','water','gravel','sandstone','brick','stoneBrick','mossStone','glass','ice','snow','clay','obsidian','sponge','bookshelf','ironBlock','goldBlock','diamondBlock','redWool','orangeWool','yellowWool','limeWool','greenWool','cyanWool','blueWool','purpleWool','whiteWool'];
+const creativeBlocks=['grass','dirt','stone','cobblestone','wood','leaves','planks','sand','water','gravel','sandstone','brick','stoneBrick','mossStone','glass','ice','clay','obsidian','sponge','bookshelf','ironBlock','goldBlock','diamondBlock','redWool','orangeWool','yellowWool','limeWool','greenWool','cyanWool','blueWool','purpleWool','whiteWool'];
 const barItems=['grass','dirt','stone','wood','planks','leaves','sand','water','glass'];
 const inventory={grass:32,dirt:32,stone:32,wood:16,planks:12,leaves:10,sand:8,sticks:0,coal:0,ironOre:0,pickaxeTier:0,shovelTier:0};
 const packColors={},pressed=Object.create(null),world=new Map(),changes=new Map(),chunks=new Map(),mats={},textures={},slimes=[],clouds=[];
 let scene,camera,renderer,sun,hemi,sunOrb,moonOrb,selectionBox,worldObjects=[],selected=0,running=false,locked=false,panel=false;
-let yaw=0,pitch=0,last=0,fpsFrames=0,fpsAt=0,clock=0,saveAt=0;
+let yaw=0,pitch=0,last=0,fpsFrames=0,fpsAt=0,clock=0,saveAt=0,fogEnabled=true;
 const player={x:0,y:10,z:0,vy:0,grounded:false},ray=new THREE.Raycaster();
 const key=(x,y,z)=>x+','+y+','+z,chunk=n=>Math.floor(n/CHUNK),setRaw=(x,y,z,t)=>{const k=key(x,y,z);t==='air'?world.delete(k):world.set(k,t);},get=(x,y,z)=>world.get(key(x,y,z))||'air';
 function random(x,z,s=0){let n=Math.imul(x+173,374761393)+Math.imul(z+591,668265263)+Math.imul(s+911,2246822519);n=Math.imul(n^(n>>>13),1274126177);return(n^(n>>>16))>>>0;}
@@ -51,7 +51,7 @@ function setupMats(){Object.assign(mats,{grassTop:material('grassTop',0x68aa45,2
 function faceMat(type,n){if(type==='grass')return n[1]===1?'grassTop':n[1]===-1?'dirt':'grassSide';if(type==='wood')return n[1]===0?'woodSide':'woodTop';return type;}
 const faces=[{n:[1,0,0],v:[[.5,-.5,-.5],[.5,.5,-.5],[.5,.5,.5],[.5,-.5,.5]]},{n:[-1,0,0],v:[[-.5,-.5,.5],[-.5,.5,.5],[-.5,.5,-.5],[-.5,-.5,-.5]]},{n:[0,1,0],v:[[-.5,.5,.5],[.5,.5,.5],[.5,.5,-.5],[-.5,.5,-.5]]},{n:[0,-1,0],v:[[-.5,-.5,-.5],[.5,-.5,-.5],[.5,-.5,.5],[-.5,-.5,.5]]},{n:[0,0,1],v:[[-.5,-.5,.5],[.5,-.5,.5],[.5,.5,.5],[-.5,.5,.5]]},{n:[0,0,-1],v:[[.5,-.5,-.5],[-.5,-.5,-.5],[-.5,.5,-.5],[.5,.5,-.5]]}];
 function buildWorld(){
- world.clear();for(let x=-40;x<40;x++)for(let z=-40;z<40;z++){const h=heightAt(x,z),beach=h<=4;for(let y=MIN_Y;y<=h;y++){let t=y===MIN_Y?'bedrock':y===h?(beach?'sand':'grass'):y>=h-3?(beach?'sand':'dirt'):'stone';if(y>MIN_Y+1&&y<h-2){const v=random(x*3+y,z*5-y,17)%265;if(v===0)t='coalOre';else if(v===1)t='ironOre';}setRaw(x,y,z,t);}if(h<5)for(let y=h+1;y<=5;y++)setRaw(x,y,z,'water');if(random(x,z,42)%173===0&&h>5&&Math.abs(x)>3&&Math.abs(z)>3){for(let y=h+1;y<=h+4;y++)setRaw(x,y,z,'wood');for(let dy=2;dy<=5;dy++)for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){if(Math.abs(dx)+Math.abs(dz)>3+(dy===5?-2:0))continue;if(get(x+dx,h+dy,z+dz)==='air')setRaw(x+dx,h+dy,z+dz,'leaves');}}}
+ world.clear();for(let x=-64;x<64;x++)for(let z=-64;z<64;z++){const h=heightAt(x,z),beach=h<=4;for(let y=MIN_Y;y<=h;y++){let t=y===MIN_Y?'bedrock':y===h?(beach?'sand':'grass'):y>=h-3?(beach?'sand':'dirt'):'stone';if(y>MIN_Y+1&&y<h-2){const v=random(x*3+y,z*5-y,17)%265;if(v===0)t='coalOre';else if(v===1)t='ironOre';}setRaw(x,y,z,t);}if(h<5)for(let y=h+1;y<=5;y++)setRaw(x,y,z,'water');if(random(x,z,42)%173===0&&h>5&&Math.abs(x)>3&&Math.abs(z)>3){for(let y=h+1;y<=h+4;y++)setRaw(x,y,z,'wood');for(let dy=2;dy<=5;dy++)for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){if(Math.abs(dx)+Math.abs(dz)>3+(dy===5?-2:0))continue;if(get(x+dx,h+dy,z+dz)==='air')setRaw(x+dx,h+dy,z+dz,'leaves');}}}
  try{const save=JSON.parse(localStorage.getItem(STORE)||'null');if(Array.isArray(save?.changes))for(const [k,t] of save.changes){const p=k.split(',').map(Number);if(p.length===3&&p.every(Number.isFinite)){changes.set(k,t);setRaw(...p,t);}}if(save?.inventory)Object.assign(inventory,save.inventory);if(save?.player&&[save.player.x,save.player.y,save.player.z].every(Number.isFinite))Object.assign(player,save.player);else player.y=heightAt(0,0)+1.42;if(save?.packColors)Object.assign(packColors,save.packColors);}catch(e){player.x=0;player.z=0;player.y=heightAt(0,0)+1.42;}
 }
 function buildChunk(cx,cz){
@@ -72,13 +72,13 @@ function makeClouds(){const geo=new THREE.BoxGeometry(3,1,2),mat=new THREE.MeshL
 function makeSlimes(){const bodyMat=new THREE.MeshLambertMaterial({color:0x73ad4e}),eyeMat=new THREE.MeshLambertMaterial({color:0xf7f3da}),pupilMat=new THREE.MeshLambertMaterial({color:0x20291b}),bodyGeo=new THREE.BoxGeometry(.8,.65,.8);for(let i=0;i<5;i++){const x=-24+i*12,z=i%2?17:-18,h=heightAt(x,z),g=new THREE.Group(),body=new THREE.Mesh(bodyGeo,bodyMat);body.position.y=.4;g.add(body);for(const side of [-1,1]){const eye=new THREE.Mesh(new THREE.BoxGeometry(.13,.15,.06),eyeMat);eye.position.set(side*.19,.52,.408);g.add(eye);const pupil=new THREE.Mesh(new THREE.BoxGeometry(.055,.08,.035),pupilMat);pupil.position.set(side*.19,.51,.45);g.add(pupil);}g.position.set(x,h+.5,z);g.userData={angle:random(x,z,3)/4294967295*Math.PI*2,speed:.4+i%3*.1,baseY:h+.5,phase:i,health:3};scene.add(g);slimes.push(g);}}
 function init(){
  try{
-  scene=new THREE.Scene();const day=new THREE.Color(0x87c5ed);scene.background=day.clone();scene.fog=new THREE.Fog(day,38,100);
+  scene=new THREE.Scene();const day=new THREE.Color(0x87c5ed);scene.background=day.clone();scene.fog=new THREE.Fog(day,55,145);
   camera=new THREE.PerspectiveCamera(76,innerWidth/innerHeight,.1,180);camera.rotation.order='YXZ';
   renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.35));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;$('game').appendChild(renderer.domElement);
   hemi=new THREE.HemisphereLight(0xe5f3ff,0x657348,1.6);scene.add(hemi);sun=new THREE.DirectionalLight(0xfff2d7,1.7);sun.position.set(-30,55,22);scene.add(sun);
   sunOrb=new THREE.Mesh(new THREE.SphereGeometry(3,12,8),new THREE.MeshBasicMaterial({color:0xffe7a3}));moonOrb=new THREE.Mesh(new THREE.SphereGeometry(2.1,10,8),new THREE.MeshBasicMaterial({color:0xdde7f5}));scene.add(sunOrb,moonOrb);
   selectionBox=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.008,1.008,1.008)),new THREE.LineBasicMaterial({color:0xffffff}));selectionBox.visible=false;scene.add(selectionBox);
-  setupMats();buildWorld();applyPackColors();for(let x=-3;x<=2;x++)for(let z=-3;z<=2;z++)buildChunk(x,z);worldObjects=[...chunks.values()];makeClouds();camera.position.set(player.x,player.y+.55,player.z);return true;
+  setupMats();buildWorld();applyPackColors();for(let x=-4;x<=3;x++)for(let z=-4;z<=3;z++)buildChunk(x,z);worldObjects=[...chunks.values()];makeClouds();camera.position.set(player.x,player.y+.55,player.z);return true;
  }catch(e){console.error(e);$('errorText').textContent='3D graphics could not start. Enable browser hardware acceleration and reload.';$('errorScreen').classList.remove('hidden');return false;}
 }
 function drawBlockIcon(canvas,item){
@@ -105,26 +105,24 @@ function drawBar(){
  const root=$('hotbar');root.innerHTML='';
  barItems.forEach((item,i)=>{
   const el=document.createElement('button');el.type='button';el.className='slot'+(selected===i?' selected':'');
-  const number=document.createElement('span');number.className='num';number.textContent=String(i+1);
-  const canvas=document.createElement('canvas');canvas.className='block-icon';canvas.width=32;canvas.height=34;canvas.setAttribute('aria-hidden','true');
-  const amount=document.createElement('span');amount.className='amount';amount.textContent='∞';
-  el.title=(info[item]?.[0]||item)+(item==='water'?' — breakable and placeable water block':'');
-  el.append(number,canvas,amount);el.onclick=()=>{selected=i;drawBar();};root.appendChild(el);drawBlockIcon(canvas,item);
+  el.setAttribute('aria-label','Slot '+(i+1)+': '+(info[item]?.[0]||item));
+  const canvas=document.createElement('canvas');canvas.className='block-icon';canvas.width=36;canvas.height=36;canvas.setAttribute('aria-hidden','true');
+  el.title=info[item]?.[0]||item;
+  el.append(canvas);el.onclick=()=>{selected=i;drawBar();};root.appendChild(el);drawBlockIcon(canvas,item);
  });
 }
 function renderInventory(){
  const root=$('inventoryGrid');root.innerHTML='';
  for(const item of creativeBlocks){
-  const b=document.createElement('button');b.className='inventory-item';b.type='button';
-  const canvas=document.createElement('canvas');canvas.className='block-preview';canvas.width=32;canvas.height=34;
-  const name=document.createElement('span');name.textContent=info[item][0];
-  const unlimited=document.createElement('small');unlimited.textContent='Unlimited';
-  b.append(canvas,name,unlimited);drawBlockIcon(canvas,item);
-  b.title='Put '+info[item][0]+' in selected hotbar slot';
-  b.onclick=()=>{barItems[selected]=item;drawBar();$('craftStatus').textContent=info[item][0]+' selected for slot '+(selected+1)+'.';};
+  const b=document.createElement('button');b.className='inventory-item'+(barItems[selected]===item?' active':'');b.type='button';
+  const canvas=document.createElement('canvas');canvas.className='block-preview';canvas.width=36;canvas.height=36;
+  b.append(canvas);drawBlockIcon(canvas,item);
+  b.title=info[item][0];
+  b.setAttribute('aria-label',info[item][0]);
+  b.onclick=()=>{barItems[selected]=item;drawBar();renderInventory();$('craftStatus').textContent=info[item][0]+' selected for hotbar slot '+(selected+1)+'.';};
   root.appendChild(b);
  }
- $('craftStatus').textContent='Choose a block to replace the selected hotbar slot. Water is a placeable, breakable block. All blocks are unlimited.';
+ $('craftStatus').textContent='Select a block for the highlighted hotbar slot. All blocks are unlimited.';
 }
 function showInventory(){panel=true;document.exitPointerLock?.();$('inventoryScreen').classList.remove('hidden');renderInventory();}
 function hideInventory(){panel=false;$('inventoryScreen').classList.add('hidden');if(running)renderer.domElement.requestPointerLock();}
@@ -136,7 +134,7 @@ function breakBlock(x,y,z,type){if(type==='air'||type==='bedrock')return;setBloc
 function placeBlock(){
  const item=barItems[selected];if(!info[item])return;
  const h=target(5.5);if(!h)return;const [x,y,z]=hitBlock(h,false);
- if(get(x,y,z)!=='air')return;
+ if(get(x,y,z)!=='air'||y>MAX_Y||y<=MIN_Y)return;
  if(Math.abs(player.x-x)<.8&&Math.abs(player.z-z)<.8&&player.y-.9<y+.5&&player.y+.9>y-.5)return;
  setBlock(x,y,z,item);
 }
@@ -144,20 +142,21 @@ function move(dt){
  const f=(pressed.KeyW||pressed.ArrowUp?1:0)-(pressed.KeyS||pressed.ArrowDown?1:0),s=(pressed.KeyD||pressed.ArrowRight?1:0)-(pressed.KeyA||pressed.ArrowLeft?1:0),mag=Math.hypot(f,s)||1,speed=pressed.ShiftLeft||pressed.ShiftRight?8.5:5.1;
  const dx=(-Math.sin(yaw)*f+Math.cos(yaw)*s)/mag*speed*dt,dz=(-Math.cos(yaw)*f-Math.sin(yaw)*s)/mag*speed*dt,ox=player.x,oz=player.z;player.x+=dx;if(collision(player.x,player.y,player.z))player.x=ox;player.z+=dz;if(collision(player.x,player.y,player.z))player.z=oz;
  if(pressed.Space&&player.grounded){player.vy=7.2;player.grounded=false;pressed.Space=false;}const oy=player.y;player.vy-=19*dt;player.y+=player.vy*dt;if(collision(player.x,player.y,player.z)){player.y=oy;if(player.vy<0)player.grounded=true;player.vy=0;}else player.grounded=false;
- player.x=Math.max(-39,Math.min(39,player.x));player.z=Math.max(-39,Math.min(39,player.z));if(player.y<MIN_Y-5){player.x=0;player.z=0;player.y=heightAt(0,0)+1.42;player.vy=0;}camera.position.set(player.x,player.y+.55,player.z);camera.rotation.set(pitch,yaw,0);
+ player.x=Math.max(-63,Math.min(63,player.x));player.z=Math.max(-63,Math.min(63,player.z));if(player.y<MIN_Y-5){player.x=0;player.z=0;player.y=heightAt(0,0)+1.42;player.vy=0;}camera.position.set(player.x,player.y+.55,player.z);camera.rotation.set(pitch,yaw,0);
 }
-function dayNight(dt){clock+=dt;const level=(Math.sin(clock*.035)+1)/2,bright=.18+level*.82,angle=clock*.035;sun.intensity=.22+1.55*bright;hemi.intensity=.5+1.2*bright;sun.position.set(Math.cos(angle)*42,Math.sin(angle)*48,Math.sin(angle*.7)*34);sunOrb.position.copy(sun.position.clone().normalize().multiplyScalar(75));moonOrb.position.copy(sunOrb.position.clone().negate());sunOrb.visible=sun.position.y>0;moonOrb.visible=sun.position.y<=0;const sky=new THREE.Color(0x111b35).lerp(new THREE.Color(0x87c5ed),bright);if(level<.18)sky.lerp(new THREE.Color(0xf0a36e),(.18-level)*2.5);scene.background.copy(sky);scene.fog.color.copy(sky);for(const c of clouds)c.position.x+=Math.sin(clock*.025+c.position.z)*dt*.15;}
+function dayNight(dt){clock+=dt;sun.intensity=1.75;hemi.intensity=1.55;sun.position.set(-32,58,24);sunOrb.position.set(-32,58,24);moonOrb.visible=false;if(scene.fog)scene.fog.color.set(0x87c5ed);for(const c of clouds)c.position.x+=Math.sin(clock*.018+c.position.z)*dt*.08;}
 function updateOutline(){const h=target(6);if(!h){selectionBox.visible=false;return;}const [x,y,z]=hitBlock(h,true);if(get(x,y,z)==='air'){selectionBox.visible=false;return;}selectionBox.visible=true;selectionBox.position.set(x,y,z);}
 function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000||0,.04);last=now;if(locked&&running&&!panel){move(dt);updateOutline();}else{selectionBox.visible=false;}dayNight(dt);renderer.render(scene,camera);fpsFrames++;if(now-fpsAt>1000){$('fps').textContent=fpsFrames+' FPS';fpsFrames=0;fpsAt=now;$('coords').textContent=Math.floor(player.x)+', '+Math.floor(player.y)+', '+Math.floor(player.z);}if(now-saveAt>12000&&running){saveWorld();saveAt=now;}}
-function applyPack(file){const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(String(reader.result));if(!data?.colors||typeof data.colors!=='object')throw Error('format');let n=0;for(const [name,color] of Object.entries(data.colors)){if(!Object.prototype.hasOwnProperty.call(info,name)||typeof color!=='string'||!/^#[0-9a-f]{6}$/i.test(color))continue;packColors[name]=color;const k=name==='grass'?'grassTop':name==='wood'?'woodSide':name;if(mats[k])mats[k].color.set(color);if(name==='grass')mats.grassSide.color.set(color);n++;}saveWorld();$('packStatus').textContent='Applied '+n+' block colours.';}catch(e){$('packStatus').textContent='Invalid Minecraft colour pack.';}};reader.readAsText(file);}
+function applyPack(file){const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(String(reader.result));if(!data?.colors||typeof data.colors!=='object')throw Error('format');let n=0;for(const [name,color] of Object.entries(data.colors)){if(!Object.prototype.hasOwnProperty.call(info,name)||typeof color!=='string'||!/^#[0-9a-f]{6}$/i.test(color))continue;packColors[name]=color;const k=name==='grass'?'grassTop':name==='wood'?'woodSide':name;if(mats[k])mats[k].color.set(color);if(name==='grass')mats.grassSide.color.set(color);n++;}drawBar();if(panel)renderInventory();saveWorld();$('packStatus').textContent='Applied '+n+' block colours.';}catch(e){$('packStatus').textContent='Invalid Minecraft colour pack.';}};reader.readAsText(file);}
 drawBar();if(init())requestAnimationFrame(frame);
-document.addEventListener('keydown',e=>{pressed[e.code]=true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(/^Digit[1-9]$/.test(e.code)){selected=+e.code.slice(5)-1;drawBar();}if((e.code==='KeyE'||e.code==='KeyB')&&running&&!panel)showInventory();else if(e.code==='Escape'&&panel)hideInventory();});
+document.addEventListener('keydown',e=>{pressed[e.code]=true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.repeat)return;if(/^Digit[1-9]$/.test(e.code)){selected=+e.code.slice(5)-1;drawBar();}if((e.code==='KeyB'||e.code==='KeyE')&&running&&!panel)showInventory();else if(e.code==='KeyF'&&running&&!panel){fogEnabled=!fogEnabled;scene.fog=fogEnabled?new THREE.Fog(0x87c5ed,55,145):null;}else if(e.code==='Escape'&&panel)hideInventory();else if(e.code==='Escape'&&running&&!locked&&!panel)resume();});
 document.addEventListener('keyup',e=>pressed[e.code]=false);
 document.addEventListener('mousemove',e=>{if(!locked||panel)return;yaw-=e.movementX*.0022;pitch=Math.max(-1.52,Math.min(1.52,pitch-e.movementY*.0022));});
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer?.domElement;if(running&&!panel&&!locked)pause();});
-document.addEventListener('mousedown',e=>{if(!locked||panel||!running)return;if(e.button===0){const h=target(6);if(h){const [x,y,z]=hitBlock(h,true);breakBlock(x,y,z,get(x,y,z));}}if(e.button===2)placeBlock();});
+document.addEventListener('mousedown',e=>{if(!locked||panel||!running)return;if(e.button===0){const h=target(6);if(h){const [x,y,z]=hitBlock(h,true);breakBlock(x,y,z,get(x,y,z));}}else if(e.button===2)placeBlock();else if(e.button===1){e.preventDefault();const h=target(6);if(h){const [x,y,z]=hitBlock(h,true),type=get(x,y,z);if(info[type]){const i=barItems.indexOf(type);if(i>=0)selected=i;else barItems[selected]=type;drawBar();}}}});
 
 document.addEventListener('contextmenu',e=>e.preventDefault());
+window.addEventListener('wheel',e=>{if(!locked||panel||!running)return;e.preventDefault();selected=(selected+(e.deltaY>0?1:8))%9;drawBar();},{passive:false});
 $('playBtn').onclick=()=>{running=true;$('startScreen').classList.add('hidden');renderer.domElement.requestPointerLock();};
 $('resumeBtn').onclick=resume;$('pauseSaveBtn').onclick=()=>{saveWorld();resume();};$('closeInventory').onclick=hideInventory;
 $('packFile').onchange=e=>{if(e.target.files[0])applyPack(e.target.files[0]);e.target.value='';};$('saveBtn').onclick=saveWorld;$('fullscreenBtn').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();};
