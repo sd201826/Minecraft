@@ -3,57 +3,66 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <meta name="theme-color" content="#18251d">
-  <title>Minecraft — Classic Creative Fan Project</title>
+  <meta name="theme-color" content="#82c8f2">
+  <title>MINECRAFT — Classic Creative</title>
   <link rel="stylesheet" href="./style.css">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 </head>
 <body>
   <main id="game"></main>
+
   <div id="hud">
-    <div class="brand">MINECRAFT <span>UNOFFICIAL FAN PROJECT</span></div>
-    <div class="stats"><span id="fps">-- FPS</span><span id="coords">0, 0, 0</span></div>
     <div class="crosshair"><i></i><b></b></div>
-    <div class="break-meter"><div id="breakFill"></div></div>
-    <div id="hotbar" aria-label="Hotbar"></div>
-    <div class="help">WASD move · Mouse look · Space jump · Shift sprint<br>Left click break · Right click place · 1–9 select · B or E block menu · Esc pause</div>
-    <div class="actions"><button id="saveBtn" title="Save world">SAVE</button><button id="fullscreenBtn" title="Fullscreen">⛶</button></div>
+    <div id="hotbar" aria-label="Nine-slot hotbar"></div>
+    <div id="debugData" hidden><span id="fps">-- FPS</span><span id="coords">0, 0, 0</span></div>
+    <div class="actions" aria-hidden="true">
+      <button id="saveBtn" title="Save world">SAVE</button>
+      <button id="fullscreenBtn" title="Fullscreen">⛶</button>
+    </div>
   </div>
 
   <section id="startScreen" class="screen">
-    <div class="menu">
-      <div class="eyebrow">A CLASSIC-STYLE CREATIVE BUILDING GAME</div>
-      <h1>MINECRAFT</h1>
-      <p>Build a world one block at a time. Choose from 33 building blocks and create whatever you imagine.</p>
-      <button class="primary" id="playBtn">ENTER WORLD</button>
-      <div class="menu-foot">Unofficial fan-made project · Single-player · Saves in this browser</div>
+    <div class="start-card">
+      <div class="logo-title">MINECRAFT</div>
+      <div class="subtitle">CLASSIC CREATIVE</div>
+      <button class="classic-button" id="playBtn">Create a new world</button>
+      <div class="start-help">Build freely in a block world. No downloads or account required.</div>
+      <div class="start-controls">WASD Move · Mouse Look · Space Jump · B Select Block</div>
     </div>
   </section>
 
   <section id="pauseScreen" class="screen hidden">
-    <div class="menu compact">
-      <div class="eyebrow">WORLD PAUSED</div><h2>Taking a break?</h2>
-      <button class="primary" id="resumeBtn">RESUME GAME</button>
-      <button class="secondary" id="pauseSaveBtn">SAVE WORLD</button>
-      <div class="menu-foot">Press Esc to resume or use the button.</div>
+    <div class="classic-panel pause-panel">
+      <div class="panel-title">Game menu</div>
+      <button class="classic-button" id="resumeBtn">Back to game</button>
+      <button class="classic-button" id="pauseSaveBtn">Save world</button>
+      <div class="control-note">WASD move · Space jump · Left click break · Right click place<br>1–9 or mouse wheel select · B select block · F toggle fog · Esc resume</div>
     </div>
   </section>
 
   <section id="inventoryScreen" class="screen hidden">
-    <div class="menu inventory-menu">
-      <div class="eyebrow">YOUR ITEMS</div><h2>Inventory</h2>
-      <div class="section-label">33 BUILDING BLOCKS</div>
-      <p id="craftStatus" class="craft-status">Choose a block to put it in your selected hotbar slot.</p>
-      <div id="inventoryGrid"></div>
-      <div class="pack-row"><label for="packFile">Load a color resource pack (.json)</label><input id="packFile" type="file" accept=".json,application/json"></div>
-      <p id="packStatus" class="menu-foot">Import a custom JSON colour pack. This fan project does not load official game files.</p>
-      <button class="primary" id="closeInventory">CLOSE BLOCK MENU</button>
+    <div class="classic-panel select-panel">
+      <div class="panel-title">Select block</div>
+      <div id="inventoryGrid" aria-label="32 creative blocks"></div>
+      <div id="craftStatus" class="status-note">Select a block for your highlighted hotbar slot.</div>
+      <details class="resource-pack">
+        <summary>Custom colour pack</summary>
+        <label for="packFile">Choose a JSON colour pack</label>
+        <input id="packFile" type="file" accept=".json,application/json">
+        <div id="packStatus">Custom block colours only; official game packs are not supported.</div>
+      </details>
+      <button class="classic-button close-button" id="closeInventory">Done</button>
     </div>
   </section>
 
   <section id="errorScreen" class="screen hidden">
-    <div class="menu compact"><div class="eyebrow">GRAPHICS ERROR</div><h2>3D graphics could not start</h2><p id="errorText">Please use a browser with WebGL enabled.</p><button class="primary" onclick="location.reload()">RELOAD</button></div>
+    <div class="classic-panel error-panel">
+      <div class="panel-title">Unable to start</div>
+      <p id="errorText">Please enable WebGL and hardware acceleration in your browser.</p>
+      <button class="classic-button" onclick="location.reload()">Reload</button>
+    </div>
   </section>
+
   <script type="module" src="./game.js"></script>
 </body>
 </html>
