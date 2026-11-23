@@ -1,46 +1,46 @@
-# BlockWorld — classic-style 3D voxel sandbox
+# Minecraft — Classic Creative Fan Project
 
-An original browser-playable voxel building game with a classic low-resolution pixel-art look. It is not the official Minecraft game and does not include Mojang assets.
+An independent browser-based voxel building game inspired by the simple creative-building era of block games. This is a fan-made project, not the official Minecraft game and not affiliated with Mojang or Microsoft. It uses original procedural textures and code; it does not copy the official game's code, artwork, logo or website.
 
 ## Play
 
-Enable **Settings → Pages → Deploy from a branch → main → /(root)**. Open the GitHub Pages URL. An internet connection is required to load the Three.js engine from jsDelivr.
+Enable **Settings → Pages → Deploy from a branch → main → /(root)**. Open the GitHub Pages URL. An internet connection is needed to load the Three.js library from jsDelivr.
 
 ## Controls
 
 | Input | Action |
 |---|---|
-| WASD | Walk |
-| Mouse | Look around |
+| WASD | Move |
+| Mouse | Look |
 | Space | Jump |
 | Shift | Sprint |
-| Hold left click | Mine the block under the crosshair |
-| Right click | Place selected block |
-| 1–9 | Select a hotbar slot |
-| E | Open inventory and crafting |
+| Left click | Break the block under the crosshair |
+| Right click | Place the selected block |
+| 1–9 | Pick a hotbar slot |
+| B or E | Open the 32-block creative library |
 | Esc | Release mouse / pause |
 
-## Features in this version
+## Included
 
-- Classic 16×16 pixel-style textures for grass, dirt, stone, logs, leaves, planks, sand and ores
-- Procedural hills, beaches, trees, water, clouds, sun and moon with a day/night lighting cycle
-- Chunk-based mesh rendering that draws exposed block faces instead of creating a separate 3D object for each cube
-- First-person movement, gravity, collision, jumping and sprinting
-- Hold-to-mine progress, block placement and a nine-slot hotbar
-- Inventory and crafting recipes for planks, sticks, wooden/stone pickaxes and wooden/stone shovels
-- Peaceful wandering slime creatures
-- Browser-local world saves and simple JSON colour resource packs
+- Original pixel-style 16×16 block textures
+- 32 selectable creative building blocks and an unlimited hotbar
+- Procedural hills, trees, water, beaches and ore-filled ground
+- Chunk-based mesh rendering
+- First-person movement, collision, jumping and mouse look
+- Block selection outline and browser-local world saving
+- Day/night sky and drifting clouds
+- JSON colour packs for changing block colours
 
-## Simple colour packs
+## Custom colour packs
 
-Import a JSON file from the inventory, for example:
+Load a JSON file in the block library:
 
 ```json
-{"colors":{"grass":"#55aa44","dirt":"#805332","stone":"#999999","wood":"#79502e","leaves":"#267a35","water":"#398ed1"}}
+{"colors":{"grass":"#55aa44","dirt":"#805332","stone":"#999999","wood":"#79502e","leaves":"#267a35"}}
 ```
 
-This is BlockWorld's own simple recolour format. Standard Minecraft Java/Bedrock resource packs and arbitrary code mods are not yet supported.
+This is a small, original colour-pack format. It does not load official Minecraft Java/Bedrock resource packs or mods.
 
-## Current limitations
+## Not included yet
 
-This remains an early single-player browser game. It does not yet include multiplayer hosting, a full mod loader, caves, villages, survival hunger/health or all Minecraft crafting recipes. The world saves in the browser where you play it.
+Online multiplayer, server hosting, a third-party mod loader and official Minecraft asset compatibility are not implemented.
