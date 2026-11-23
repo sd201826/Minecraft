@@ -4,29 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <meta name="theme-color" content="#18251d">
-  <title>BlockWorld — 3D Voxel Sandbox</title>
+  <title>Minecraft — Classic Creative Fan Project</title>
   <link rel="stylesheet" href="./style.css">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 </head>
 <body>
   <main id="game"></main>
   <div id="hud">
-    <div class="brand">BLOCKWORLD <span>EARLY ACCESS</span></div>
+    <div class="brand">MINECRAFT <span>UNOFFICIAL FAN PROJECT</span></div>
     <div class="stats"><span id="fps">-- FPS</span><span id="coords">0, 0, 0</span></div>
     <div class="crosshair"><i></i><b></b></div>
     <div class="break-meter"><div id="breakFill"></div></div>
     <div id="hotbar" aria-label="Hotbar"></div>
-    <div class="help">WASD move · Mouse look · Space jump · Shift sprint<br>Hold left click mine · Right click build · 1–9 select · E inventory and crafting · Esc pause</div>
+    <div class="help">WASD move · Mouse look · Space jump · Shift sprint<br>Left click break · Right click place · 1–9 select · B or E block menu · Esc pause</div>
     <div class="actions"><button id="saveBtn" title="Save world">SAVE</button><button id="fullscreenBtn" title="Fullscreen">⛶</button></div>
   </div>
 
   <section id="startScreen" class="screen">
     <div class="menu">
-      <div class="eyebrow">A PROCEDURAL VOXEL SANDBOX</div>
-      <h1>BLOCK<span>WORLD</span></h1>
-      <p>A classic block-building adventure. Explore rolling hills, mine, craft tools and build your own place.</p>
+      <div class="eyebrow">A CLASSIC-STYLE CREATIVE BUILDING GAME</div>
+      <h1>MINECRAFT</h1>
+      <p>Build a world one block at a time. Choose from 32 building blocks and create whatever you imagine.</p>
       <button class="primary" id="playBtn">ENTER WORLD</button>
-      <div class="menu-foot">Single-player · Autosaves in this browser</div>
+      <div class="menu-foot">Unofficial fan-made project · Single-player · Saves in this browser</div>
     </div>
   </section>
 
@@ -42,14 +42,12 @@
   <section id="inventoryScreen" class="screen hidden">
     <div class="menu inventory-menu">
       <div class="eyebrow">YOUR ITEMS</div><h2>Inventory</h2>
-      <div class="section-label">BACKPACK</div>
+      <div class="section-label">32 BUILDING BLOCKS</div>
+      <p id="craftStatus" class="craft-status">Choose a block to put it in your selected hotbar slot.</p>
       <div id="inventoryGrid"></div>
-      <div class="section-label">CRAFTING</div>
-      <div id="craftRecipes"></div>
-      <p id="craftStatus" class="craft-status">Gather logs and stone to craft equipment.</p>
       <div class="pack-row"><label for="packFile">Load a color resource pack (.json)</label><input id="packFile" type="file" accept=".json,application/json"></div>
-      <p id="packStatus" class="menu-foot">Import a BlockWorld JSON colour pack. Standard Java/Bedrock packs are not supported yet.</p>
-      <button class="primary" id="closeInventory">BACK TO GAME</button>
+      <p id="packStatus" class="menu-foot">Import a custom JSON colour pack. This fan project does not load official game files.</p>
+      <button class="primary" id="closeInventory">CLOSE BLOCK MENU</button>
     </div>
   </section>
 
